@@ -1,2 +1,2 @@
 # SHIELD
-SHapley-based Information-theoretic and Equitable Learning via Dissimilarity
+SHapley-based Information-theoretic model for Equitable Learning via Dissimilarity
