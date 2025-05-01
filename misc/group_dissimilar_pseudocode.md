@@ -67,7 +67,7 @@
 
 **Repeat the allocation process until all features have been allocated.**
 - D against Group 0 &rarr; D against A &rarr; **0.8**
-- D against Group 1 &rarr; D against C and D against B &rarr; avg(0.1,0.75) = 0.425
+- D against Group 1 &rarr; D against C and D against B &rarr; avg(0.1, 0.75) = 0.425
 
 **Results**
 - Group 0: [A, D]
