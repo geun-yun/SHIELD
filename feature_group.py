@@ -72,6 +72,11 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
                 assigned.add(best_feature_idx)
                 remaining.discard(best_feature_idx)
 
+    # Print grouped features for tracking
+    print("\nGrouped features (maximally dissimilar):")
+    for group_id, feature_list in groups.items():
+        print(f" Group {group_id}: {feature_list}")
+        
     return groups
 
 
