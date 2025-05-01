@@ -25,22 +25,25 @@ def run_full_pipeline(dataset_name, num_groups=5, encoding_dim=1, test_size=0.2,
 
     # Group features and encode
     groups = group_dissimilar(data, num_groups=num_groups)
-    encoded_data = create_group_autoencoders(data, groups, encoding_dim=encoding_dim)
+    # encoded_data = create_group_autoencoders(data, groups, encoding_dim=encoding_dim)
 
-    # Add the target column back
-    encoded_data["target"] = data.iloc[:, -1].values
+    # # # Add the target column back
+    # # encoded_data["target"] = data.iloc[:, -1].values
 
-    # Split data
-    X = encoded_data.drop(columns=["target"])
-    y = encoded_data["target"]
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    # # # Split data
+    # # X = encoded_data.drop(columns=["target"])
+    # # y = encoded_data["target"]
+    # # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
 
-    # Evaluate performance
-    results = evaluate_metrics(X_train, y_train, X_test, y_test, task_name=dataset_name)
-    print(results)
+    # # # Evaluate performance
+    # # results = evaluate_metrics(X_train, y_train, X_test, y_test, task_name=dataset_name)
+    # # print(results)
 
-    # Evaluate SHAP
-    evaluate_shap(X_train, y_train, X_test, dataset_name)
+    # # # Evaluate SHAP
+    # # evaluate_shap(X_train, y_train, X_test, dataset_name)
 
 
 run_full_pipeline("Obesity")
+run_full_pipeline("Breast_cancer")
+run_full_pipeline("Heart_disease")
+run_full_pipeline("Lung_cancer")

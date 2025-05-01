@@ -1,0 +1,247 @@
+==== Running pipeline for: Obesity ====
+(Obesity) Metadata:
+{'uci_id': 544, 'name': 'Estimation of Obesity Levels Based On Eating Habits and Physical Condition ', 'repository_url': 'https://archive.ics.uci.edu/dataset/544/estimation+of+obesity+levels+based+on+eating+habits+and+physical+condition', 'data_url': 'https://archive.ics.uci.edu/static/public/544/data.csv', 'abstract': 'This dataset include data for the estimation of obesity levels in individuals from the countries of Mexico, Peru and Colombia, based on their eating habits and physical condition. ', 'area': 'Health and Medicine', 'tasks': ['Classification', 'Regression', 'Clustering'], 'characteristics': ['Multivariate'], 'num_instances': 2111, 'num_features': 16, 'feature_types': ['Integer'], 'demographics': ['Gender', 'Age'], 'target_col': ['NObeyesdad'], 'index_col': None, 'has_missing_values': 'no', 'missing_values_symbol': None, 'year_of_dataset_creation': 2019, 'last_updated': 'Tue Sep 10 2024', 'dataset_doi': '10.24432/C5H31Z', 'creators': [], 'intro_paper': {'ID': 358, 'type': 'NATIVE', 'title': 'Dataset for estimation of obesity levels based on eating habits and physical condition in individuals from Colombia, Peru and Mexico', 'authors': 'Fabio Mendoza Palechor, Alexis De la Hoz Manotas', 'venue': 'Data in Brief', 'year': 2019, 'journal': None, 'DOI': '10.1016/j.dib.2019.104344', 'URL': 'https://www.semanticscholar.org/paper/35b40bacd2ffa9370885b7a3004d88995fd1d011', 'sha': None, 'corpus': None, 'arxiv': None, 'mag': None, 'acl': None, 'pmid': None, 'pmcid': None}, 'additional_info': {'summary': 'This dataset include data for the estimation of obesity levels in individuals from the countries of Mexico, Peru and Colombia, based on their eating habits and physical condition. The data contains 17 attributes and 2111 records, the records are labeled with the class variable NObesity (Obesity Level), that allows classification of the data using the values of Insufficient Weight, Normal Weight, Overweight Level I, Overweight Level II, Obesity Type I, Obesity Type II and Obesity Type III. 77% of the data was generated synthetically using the Weka tool and the SMOTE filter, 23% of the data 
+was collected directly from users through a web platform.', 'purpose': None, 'funded_by': None, 'instances_represent': None, 'recommended_data_splits': 
+None, 'sensitive_data': None, 'preprocessing_description': None, 'variable_info': 'Read the article (https://doi.org/10.1016/j.dib.2019.104344) to see the description of the attributes.', 'citation': None}}
+(Obesity) Variables:
+                              name     role         type demographic                                        description units missing_values
+0                           Gender  Feature  Categorical      Gender                                               None  None             no
+1                              Age  Feature   Continuous         Age                                               None  None             no
+2                           Height  Feature   Continuous        None                                               None  None             no
+3                           Weight  Feature   Continuous        None                                               None  None             no
+4   family_history_with_overweight  Feature       Binary        None  Has a family member suffered or suffers from o...  None             no
+5                             FAVC  Feature       Binary        None           Do you eat high caloric food frequently?  None             no
+6                             FCVC  Feature      Integer        None       Do you usually eat vegetables in your meals?  None             no
+7                              NCP  Feature   Continuous        None             How many main meals do you have daily?  None             no
+8                             CAEC  Feature  Categorical        None                 Do you eat any food between meals?  None             no
+9                            SMOKE  Feature       Binary        None                                      Do you smoke?  None             no
+10                            CH2O  Feature   Continuous        None                 How much water do you drink daily?  None             no
+11                             SCC  Feature       Binary        None         Do you monitor the calories you eat daily?  None             no
+12                             FAF  Feature   Continuous        None           How often do you have physical activity?  None             no
+13                             TUE  Feature      Integer        None  How much time do you use technological devices...  None             no
+14                            CALC  Feature  Categorical        None                    How often do you drink alcohol?  None             no
+15                          MTRANS  Feature  Categorical        None           Which transportation do you usually use?  None             no
+16                      NObeyesdad   Target  Categorical        None                                      Obesity level  None             no
+(Obesity) Dropped rows with NA: 0
+    Age  Height  Weight  FCVC  NCP  CAEC  ...  SCC_yes  MTRANS_Automobile  MTRANS_Bike  MTRANS_Motorbike  MTRANS_Public_Transportation  MTRANS_Walking
+0  21.0    1.62    64.0   2.0  3.0   1.0  ...      0.0                0.0          0.0               0.0                           1.0             0.0  
+1  21.0    1.52    56.0   3.0  3.0   1.0  ...      1.0                0.0          0.0               0.0                           1.0             0.0  
+2  23.0    1.80    77.0   2.0  3.0   1.0  ...      0.0                0.0          0.0               0.0                           1.0             0.0  
+3  27.0    1.80    87.0   3.0  3.0   1.0  ...      0.0                0.0          0.0               0.0                           0.0             1.0  
+4  22.0    1.78    89.8   2.0  1.0   1.0  ...      0.0                0.0          0.0               0.0                           1.0             0.0  
+5  29.0    1.62    53.0   2.0  3.0   1.0  ...      0.0                1.0          0.0               0.0                           0.0             0.0  
+6  23.0    1.50    55.0   3.0  3.0   1.0  ...      0.0                0.0          0.0               1.0                           0.0             0.0  
+7  22.0    1.64    53.0   2.0  3.0   1.0  ...      0.0                0.0          0.0               0.0                           1.0             0.0  
+8  24.0    1.78    64.0   3.0  3.0   1.0  ...      0.0                0.0          0.0               0.0                           1.0             0.0  
+9  22.0    1.72    68.0   2.0  3.0   1.0  ...      0.0                0.0          0.0               0.0                           1.0             0.0  
+
+[10 rows x 26 columns]
+Preprocessed columns:  ['Age', 'Height', 'Weight', 'FCVC', 'NCP', 'CAEC', 'CH2O', 'FAF', 'TUE', 'CALC', 'NObeyesdad', 'Gender_Female', 'Gender_Male', 'family_history_with_overweight_no', 'family_history_with_overweight_yes', 'FAVC_no', 'FAVC_yes', 'SMOKE_no', 'SMOKE_yes', 'SCC_no', 'SCC_yes', 'MTRANS_Automobile', 'MTRANS_Bike', 'MTRANS_Motorbike', 'MTRANS_Public_Transportation', 'MTRANS_Walking']
+
+Grouped features (maximally dissimilar):
+ Group 0: ['CAEC', 'MTRANS_Public_Transportation', 'SCC_no', 'FAVC_yes', 'CH2O']
+ Group 1: ['SMOKE_no', 'MTRANS_Automobile', 'SCC_yes', 'NObeyesdad', 'FAF']
+ Group 2: ['SMOKE_yes', 'family_history_with_overweight_no', 'Gender_Female', 'NCP', 'Weight']
+ Group 3: ['MTRANS_Motorbike', 'CALC', 'Gender_Male', 'TUE', 'Age']
+ Group 4: ['MTRANS_Bike', 'family_history_with_overweight_yes', 'FAVC_no', 'FCVC', 'Height']
+
+==== Running pipeline for: Breast_cancer ====
+(Breast_cancer) Metadata:
+{'uci_id': 17, 'name': 'Breast Cancer Wisconsin (Diagnostic)', 'repository_url': 'https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic', 'data_url': 'https://archive.ics.uci.edu/static/public/17/data.csv', 'abstract': 'Diagnostic Wisconsin Breast Cancer Database.', 'area': 'Health and Medicine', 'tasks': ['Classification'], 'characteristics': ['Multivariate'], 'num_instances': 569, 'num_features': 30, 'feature_types': ['Real'], 'demographics': [], 'target_col': ['Diagnosis'], 'index_col': ['ID'], 'has_missing_values': 'no', 'missing_values_symbol': None, 'year_of_dataset_creation': 1993, 'last_updated': 'Fri Nov 03 2023', 'dataset_doi': '10.24432/C5DW2B', 'creators': ['William Wolberg', 'Olvi Mangasarian', 'Nick Street', 'W. Street'], 'intro_paper': {'ID': 230, 'type': 'NATIVE', 'title': 'Nuclear feature extraction for breast tumor diagnosis', 'authors': 'W. Street, W. Wolberg, 
+O. Mangasarian', 'venue': 'Electronic imaging', 'year': 1993, 'journal': None, 'DOI': '10.1117/12.148698', 'URL': 'https://www.semanticscholar.org/paper/53f0fbb425bc14468eb3bf96b2e1d41ba8087f36', 'sha': None, 'corpus': None, 'arxiv': None, 'mag': None, 'acl': None, 'pmid': None, 'pmcid': None}, 'additional_info': {'summary': 'Features are computed from a digitized image of a fine needle aspirate (FNA) of a breast mass.  They describe characteristics of the cell nuclei present in the image. A few of the images can be found at http://www.cs.wisc.edu/~street/images/\r\n\r\nSeparating plane described above was obtained using Multisurface Method-Tree (MSM-T) [K. P. Bennett, "Decision Tree Construction Via Linear Programming." Proceedings of the 4th Midwest Artificial Intelligence and Cognitive Science Society, pp. 97-101, 1992], a classification method which uses linear programming to construct a decision tree.  Relevant features were selected using an exhaustive search in the space of 1-4 features and 1-3 separating planes.\r\n\r\nThe actual linear program used to obtain the separating plane in the 3-dimensional space is that described in: [K. P. Bennett and O. L. Mangasarian: "Robust Linear Programming Discrimination of Two Linearly Inseparable Sets", Optimization Methods and Software 1, 1992, 23-34].\r\n\r\nThis database is also available through the UW CS ftp server:\r\nftp ftp.cs.wisc.edu\r\ncd math-prog/cpo-dataset/machine-learn/WDBC/', 'purpose': None, 'funded_by': None, 'instances_represent': None, 'recommended_data_splits': None, 'sensitive_data': None, 'preprocessing_description': None, 'variable_info': '1) ID number\r\n2) Diagnosis (M = malignant, B = benign)\r\n3-32)\r\n\r\nTen real-valued features are computed for each cell nucleus:\r\n\r\n\ta) radius (mean of distances from center to 
+points on the perimeter)\r\n\tb) texture (standard deviation of gray-scale values)\r\n\tc) perimeter\r\n\td) area\r\n\te) smoothness (local variation in radius lengths)\r\n\tf) compactness (perimeter^2 / area - 1.0)\r\n\tg) concavity (severity of concave portions of the contour)\r\n\th) concave points (number of concave portions of the contour)\r\n\ti) symmetry \r\n\tj) fractal dimension ("coastline approximation" - 1)', 'citation': None}}
+(Breast_cancer) Variables:
+                  name     role         type demographic description units missing_values
+0                   ID       ID  Categorical        None        None  None             no
+1            Diagnosis   Target  Categorical        None        None  None             no
+2              radius1  Feature   Continuous        None        None  None             no
+3             texture1  Feature   Continuous        None        None  None             no
+4           perimeter1  Feature   Continuous        None        None  None             no
+5                area1  Feature   Continuous        None        None  None             no
+6          smoothness1  Feature   Continuous        None        None  None             no
+7         compactness1  Feature   Continuous        None        None  None             no
+8           concavity1  Feature   Continuous        None        None  None             no
+9      concave_points1  Feature   Continuous        None        None  None             no
+10           symmetry1  Feature   Continuous        None        None  None             no
+11  fractal_dimension1  Feature   Continuous        None        None  None             no
+12             radius2  Feature   Continuous        None        None  None             no
+13            texture2  Feature   Continuous        None        None  None             no
+14          perimeter2  Feature   Continuous        None        None  None             no
+15               area2  Feature   Continuous        None        None  None             no
+16         smoothness2  Feature   Continuous        None        None  None             no
+17        compactness2  Feature   Continuous        None        None  None             no
+18          concavity2  Feature   Continuous        None        None  None             no
+19     concave_points2  Feature   Continuous        None        None  None             no
+20           symmetry2  Feature   Continuous        None        None  None             no
+21  fractal_dimension2  Feature   Continuous        None        None  None             no
+22             radius3  Feature   Continuous        None        None  None             no
+23            texture3  Feature   Continuous        None        None  None             no
+24          perimeter3  Feature   Continuous        None        None  None             no
+25               area3  Feature   Continuous        None        None  None             no
+26         smoothness3  Feature   Continuous        None        None  None             no
+27        compactness3  Feature   Continuous        None        None  None             no
+28          concavity3  Feature   Continuous        None        None  None             no
+29     concave_points3  Feature   Continuous        None        None  None             no
+30           symmetry3  Feature   Continuous        None        None  None             no
+31  fractal_dimension3  Feature   Continuous        None        None  None             no
+(Breast_cancer) Dropped rows with NA: 0
+   radius1  texture1  perimeter1   area1  smoothness1  ...  concave_points3  symmetry3  fractal_dimension3  Diagnosis_B  Diagnosis_M
+0    17.99     10.38      122.80  1001.0      0.11840  ...           0.2654     0.4601             0.11890          0.0          1.0
+1    20.57     17.77      132.90  1326.0      0.08474  ...           0.1860     0.2750             0.08902          0.0          1.0
+2    19.69     21.25      130.00  1203.0      0.10960  ...           0.2430     0.3613             0.08758          0.0          1.0
+3    11.42     20.38       77.58   386.1      0.14250  ...           0.2575     0.6638             0.17300          0.0          1.0
+4    20.29     14.34      135.10  1297.0      0.10030  ...           0.1625     0.2364             0.07678          0.0          1.0
+5    12.45     15.70       82.57   477.1      0.12780  ...           0.1741     0.3985             0.12440          0.0          1.0
+6    18.25     19.98      119.60  1040.0      0.09463  ...           0.1932     0.3063             0.08368          0.0          1.0
+7    13.71     20.83       90.20   577.9      0.11890  ...           0.1556     0.3196             0.11510          0.0          1.0
+8    13.00     21.82       87.50   519.8      0.12730  ...           0.2060     0.4378             0.10720          0.0          1.0
+9    12.46     24.04       83.97   475.9      0.11860  ...           0.2210     0.4366             0.20750          0.0          1.0
+
+[10 rows x 32 columns]
+Preprocessed columns:  ['radius1', 'texture1', 'perimeter1', 'area1', 'smoothness1', 'compactness1', 'concavity1', 'concave_points1', 'symmetry1', 'fractal_dimension1', 'radius2', 'texture2', 'perimeter2', 'area2', 'smoothness2', 'compactness2', 'concavity2', 'concave_points2', 'symmetry2', 'fractal_dimension2', 'radius3', 'texture3', 'perimeter3', 'area3', 'smoothness3', 'compactness3', 'concavity3', 'concave_points3', 'symmetry3', 'fractal_dimension3', 'Diagnosis_B', 'Diagnosis_M']
+
+Grouped features (maximally dissimilar):
+ Group 0: ['smoothness3', 'symmetry1', 'concave_points1', 'compactness3', 'concave_points2', 'fractal_dimension1', 'fractal_dimension3']
+ Group 1: ['concave_points3', 'perimeter1', 'perimeter3', 'radius2', 'smoothness1', 'compactness1']
+ Group 2: ['radius1', 'concavity2', 'area2', 'symmetry3', 'compactness2', 'texture2']
+ Group 3: ['radius3', 'concavity1', 'perimeter2', 'area1', 'texture3', 'fractal_dimension2']
+ Group 4: ['Diagnosis_B', 'texture1', 'concavity3', 'area3', 'smoothness2', 'symmetry2']
+
+==== Running pipeline for: Heart_disease ====
+(Heart_disease) Metadata:
+{'uci_id': 45, 'name': 'Heart Disease', 'repository_url': 'https://archive.ics.uci.edu/dataset/45/heart+disease', 'data_url': 'https://archive.ics.uci.edu/static/public/45/data.csv', 'abstract': '4 databases: Cleveland, Hungary, Switzerland, and the VA Long Beach', 'area': 'Health and Medicine', 'tasks': ['Classification'], 'characteristics': ['Multivariate'], 'num_instances': 303, 'num_features': 13, 'feature_types': ['Categorical', 'Integer', 'Real'], 'demographics': ['Age', 'Sex'], 'target_col': ['num'], 'index_col': None, 'has_missing_values': 'yes', 'missing_values_symbol': 'NaN', 'year_of_dataset_creation': 1989, 'last_updated': 'Fri Nov 03 2023', 'dataset_doi': '10.24432/C52P4X', 'creators': ['Andras Janosi', 'William Steinbrunn', 'Matthias Pfisterer', 'Robert Detrano'], 'intro_paper': {'ID': 231, 'type': 'NATIVE', 'title': 'International application of a new probability algorithm for the diagnosis of coronary artery disease.', 'authors': 'R. Detrano, A. Jánosi, W. Steinbrunn, M. Pfisterer, J. Schmid, S. Sandhu, K. Guppy, S. Lee, V. Froelicher', 'venue': 'American Journal of Cardiology', 'year': 1989, 'journal': None, 'DOI': None, 'URL': 'https://www.semanticscholar.org/paper/a7d714f8f87bfc41351eb5ae1e5472f0ebbe0574', 'sha': None, 'corpus': None, 'arxiv': None, 'mag': None, 'acl': None, 'pmid': '2756873', 'pmcid': None}, 'additional_info': {'summary': 'This database contains 76 attributes, but all published experiments refer to using a subset of 14 of them.  In particular, the Cleveland database is the only one that has been used by ML researchers to date.  The "goal" field refers to the presence of heart disease in the patient.  It is integer valued from 0 (no presence) to 4. Experiments with the Cleveland database have concentrated on simply attempting to distinguish presence (values 
+1,2,3,4) from absence (value 0).  \n   \nThe names and social security numbers of the patients were recently removed from the database, replaced with dummy values.\n\nOne file has been "processed", that one containing the Cleveland database.  All four unprocessed files also exist in this directory.\n\nTo see Test Costs (donated by Peter Turney), please see the folder "Costs" ', 'purpose': None, 'funded_by': None, 'instances_represent': None, 'recommended_data_splits': None, 'sensitive_data': None, 'preprocessing_description': None, 'variable_info': 'Only 14 attributes used:\r\n      1. #3  (age)      
+ \r\n      2. #4  (sex)       \r\n      3. #9  (cp)        \r\n      4. #10 (trestbps)  \r\n      5. #12 (chol)      \r\n      6. #16 (fbs)       \r\n  
+    7. #19 (restecg)   \r\n      8. #32 (thalach)   \r\n      9. #38 (exang)     \r\n      10. #40 (oldpeak)   \r\n      11. #41 (slope)     \r\n      12. #44 (ca)        \r\n      13. #51 (thal)      \r\n      14. #58 (num)       (the predicted attribute)\r\n\r\nComplete attribute documentation:\r\n   
+   1 id: patient identification number\r\n      2 ccf: social security number (I replaced this with a dummy value of 0)\r\n      3 age: age in years\r\n      4 sex: sex (1 = male; 0 = female)\r\n      5 painloc: chest pain location (1 = substernal; 0 = otherwise)\r\n      6 painexer (1 = provoked by exertion; 0 = otherwise)\r\n      7 relrest (1 = relieved after rest; 0 = otherwise)\r\n      8 pncaden (sum of 5, 6, and 7)\r\n      9 cp: chest pain type\r\n        -- Value 1: typical angina\r\n        -- Value 2: atypical angina\r\n        -- Value 3: non-anginal pain\r\n        -- Value 4: asymptomatic\r\n     10 trestbps: resting blood pressure (in mm Hg on admission to the hospital)\r\n     11 htn\r\n     12 chol: serum cholestoral in mg/dl\r\n    
+ 13 smoke: I believe this is 1 = yes; 0 = no (is or is not a smoker)\r\n     14 cigs (cigarettes per day)\r\n     15 years (number of years as a smoker)\r\n     16 fbs: (fasting blood sugar > 120 mg/dl)  (1 = true; 0 = false)\r\n     17 dm (1 = history of diabetes; 0 = no such history)\r\n     18 famhist: family history of coronary artery disease (1 = yes; 0 = no)\r\n     19 restecg: resting electrocardiographic results\r\n        -- Value 0: normal\r\n        -- Value 1: having ST-T wave abnormality (T wave inversions and/or ST elevation or depression of > 0.05 mV)\r\n        -- Value 2: showing probable or definite left ventricular hypertrophy by Estes\' criteria\r\n     20 ekgmo (month of exercise ECG reading)\r\n     21 ekgday(day of exercise ECG reading)\r\n     22 ekgyr (year of exercise ECG reading)\r\n     23 dig (digitalis used furing exercise ECG: 1 = yes; 0 = no)\r\n     24 prop (Beta blocker used during exercise ECG: 1 = yes; 0 = no)\r\n     25 nitr (nitrates used during exercise ECG: 1 = yes; 0 = no)\r\n     26 pro (calcium channel blocker used during exercise ECG: 1 = yes; 0 = no)\r\n     27 diuretic (diuretic used used during exercise ECG: 1 = yes; 0 = no)\r\n     28 proto: exercise protocol\r\n          1 = Bruce     \r\n          2 = Kottus\r\n          3 = McHenry\r\n          4 = fast Balke\r\n          5 = Balke\r\n          6 = Noughton \r\n          7 = bike 150 kpa min/min  (Not sure if "kpa min/min" is what was written!)\r\n          8 = bike 125 kpa min/min  \r\n        
+  9 = bike 100 kpa min/min\r\n         10 = bike 75 kpa min/min\r\n         11 = bike 50 kpa min/min\r\n         12 = arm ergometer\r\n     29 thaldur: 
+duration of exercise test in minutes\r\n     30 thaltime: time when ST measure depression was noted\r\n     31 met: mets achieved\r\n     32 thalach: maximum heart rate achieved\r\n     33 thalrest: resting heart rate\r\n     34 tpeakbps: peak exercise blood pressure (first of 2 parts)\r\n     35 tpeakbpd: peak exercise blood pressure (second of 2 parts)\r\n     36 dummy\r\n     37 trestbpd: resting blood pressure\r\n     38 exang: exercise induced angina (1 = yes; 0 = no)\r\n     39 xhypo: (1 = yes; 0 = no)\r\n     40 oldpeak = ST depression induced by exercise relative to rest\r\n     41 slope: the 
+slope of the peak exercise ST segment\r\n        -- Value 1: upsloping\r\n        -- Value 2: flat\r\n        -- Value 3: downsloping\r\n     42 rldv5: 
+height at rest\r\n     43 rldv5e: height at peak exercise\r\n     44 ca: number of major vessels (0-3) colored by flourosopy\r\n     45 restckm: irrelevant\r\n     46 exerckm: irrelevant\r\n     47 restef: rest raidonuclid (sp?) ejection fraction\r\n     48 restwm: rest wall (sp?) motion abnormality\r\n        0 = none\r\n        1 = mild or moderate\r\n        2 = moderate or severe\r\n        3 = akinesis or dyskmem (sp?)\r\n     49 exeref: exercise 
+radinalid (sp?) ejection fraction\r\n     50 exerwm: exercise wall (sp?) motion \r\n     51 thal: 3 = normal; 6 = fixed defect; 7 = reversable defect\r\n     52 thalsev: not used\r\n     53 thalpul: not used\r\n     54 earlobe: not used\r\n     55 cmo: month of cardiac cath (sp?)  (perhaps "call")\r\n  
+   56 cday: day of cardiac cath (sp?)\r\n     57 cyr: year of cardiac cath (sp?)\r\n     58 num: diagnosis of heart disease (angiographic disease status)\r\n        -- Value 0: < 50% diameter narrowing\r\n        -- Value 1: > 50% diameter narrowing\r\n        (in any major vessel: attributes 59 through 68 are vessels)\r\n     59 lmt\r\n     60 ladprox\r\n     61 laddist\r\n     62 diag\r\n     63 cxmain\r\n     64 ramus\r\n     65 om1\r\n     66 om2\r\n     67 rcaprox\r\n     68 rcadist\r\n     69 lvx1: not used\r\n     70 lvx2: not used\r\n     71 lvx3: not used\r\n     72 lvx4: not used\r\n     73 
+lvf: not used\r\n     74 cathef: not used\r\n     75 junk: not used\r\n     76 name: last name of patient  (I replaced this with the dummy string "name")', 'citation': None}}
+(Heart_disease) Variables:
+        name     role         type demographic                                        description  units missing_values
+0        age  Feature      Integer         Age                                               None  years             no
+1        sex  Feature  Categorical         Sex                                               None   None             no
+2         cp  Feature  Categorical        None                                               None   None             no
+3   trestbps  Feature      Integer        None  resting blood pressure (on admission to the ho...  mm Hg             no
+4       chol  Feature      Integer        None                                  serum cholestoral  mg/dl             no
+5        fbs  Feature  Categorical        None                    fasting blood sugar > 120 mg/dl   None             no
+6    restecg  Feature  Categorical        None                                               None   None             no
+7    thalach  Feature      Integer        None                        maximum heart rate achieved   None             no
+8      exang  Feature  Categorical        None                            exercise induced angina   None             no
+9    oldpeak  Feature      Integer        None  ST depression induced by exercise relative to ...   None             no
+10     slope  Feature  Categorical        None                                               None   None             no
+11        ca  Feature      Integer        None  number of major vessels (0-3) colored by flour...   None            yes
+12      thal  Feature  Categorical        None                                               None   None            yes
+13       num   Target      Integer        None                         diagnosis of heart disease   None             no
+(Heart_disease) Dropped rows with NA: 6
+   age  sex  cp  trestbps  chol  fbs  restecg  thalach  exang  oldpeak  slope   ca  thal  num
+0   63    1   1       145   233    1        2      150      0      2.3      3  0.0   6.0    0
+1   67    1   4       160   286    0        2      108      1      1.5      2  3.0   3.0    2
+2   67    1   4       120   229    0        2      129      1      2.6      2  2.0   7.0    1
+3   37    1   3       130   250    0        0      187      0      3.5      3  0.0   3.0    0
+4   41    0   2       130   204    0        2      172      0      1.4      1  0.0   3.0    0
+5   56    1   2       120   236    0        0      178      0      0.8      1  0.0   3.0    0
+6   62    0   4       140   268    0        2      160      0      3.6      3  2.0   3.0    3
+7   57    0   4       120   354    0        0      163      1      0.6      1  0.0   3.0    0
+8   63    1   4       130   254    0        2      147      0      1.4      2  1.0   7.0    2
+9   53    1   4       140   203    1        2      155      1      3.1      3  0.0   7.0    1
+Preprocessed columns:  ['age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg', 'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal', 'num']
+
+Grouped features (maximally dissimilar):
+ Group 0: ['slope', 'thal', 'trestbps']
+ Group 1: ['restecg', 'cp', 'thalach']
+ Group 2: ['exang', 'ca', 'chol']
+ Group 3: ['sex', 'oldpeak']
+ Group 4: ['fbs', 'age']
+
+==== Running pipeline for: Lung_cancer ====
+(Lung_cancer) Metadata:
+{'uci_id': 62, 'name': 'Lung Cancer', 'repository_url': 'https://archive.ics.uci.edu/dataset/62/lung+cancer', 'data_url': 'https://archive.ics.uci.edu/static/public/62/data.csv', 'abstract': 'Lung cancer data; no attribute definitions', 'area': 'Health and Medicine', 'tasks': ['Classification'], 'characteristics': ['Multivariate'], 'num_instances': 32, 'num_features': 56, 'feature_types': ['Integer'], 'demographics': [], 'target_col': ['class'], 'index_col': None, 'has_missing_values': 'yes', 'missing_values_symbol': 'NaN', 'year_of_dataset_creation': 1991, 'last_updated': 'Fri Nov 03 2023', 'dataset_doi': '10.24432/C57596', 'creators': ['Z.Q. Hong', 'J.Y Yang'], 'intro_paper': None, 'additional_info': {'summary': "This data was used by Hong and Young to illustrate the power of the optimal discriminant plane even in ill-posed settings. Applying the KNN method in the resulting plane gave 77% accuracy. However, these results are strongly biased (See Aeberhard's second ref. above, or email to stefan@coral.cs.jcu.edu.au). Results obtained by Aeberhard 
+et al. are :\r\n \r\nRDA : 62.5%, KNN 53.1%, Opt. Disc. Plane 59.4%\r\n\r\nThe data described 3 types of pathological lung cancers. The Authors give no 
+information on the individual variables nor on where the data was originally used.\r\n\r\nNotes:\r\n-  In the original data 4 values for the fifth attribute were -1. These values have been changed to ? (unknown). (*)\r\n-  In the original data 1 value for the 39 attribute was 4.  This value has been changed to ? (unknown). (*)", 'purpose': None, 'funded_by': None, 'instances_represent': None, 'recommended_data_splits': None, 'sensitive_data': None, 'preprocessing_description': None, 'variable_info': 'Attribute 1 is the class label.\r\n\r\nAll predictive attributes are nominal, taking on integer values 0-3', 'citation': None}}
+(Lung_cancer) Variables:
+           name     role         type demographic description units missing_values
+0         class   Target  Categorical        None        None  None             no
+1    Attribute1  Feature  Categorical        None        None  None             no
+2    Attribute2  Feature  Categorical        None        None  None             no
+3    Attribute3  Feature  Categorical        None        None  None             no
+4    Attribute4  Feature  Categorical        None        None  None            yes
+5    Attribute5  Feature  Categorical        None        None  None             no
+6    Attribute6  Feature  Categorical        None        None  None             no
+7    Attribute7  Feature  Categorical        None        None  None             no
+8    Attribute8  Feature  Categorical        None        None  None             no
+9    Attribute9  Feature  Categorical        None        None  None             no
+10  Attribute10  Feature  Categorical        None        None  None             no
+11  Attribute11  Feature  Categorical        None        None  None             no
+12  Attribute12  Feature  Categorical        None        None  None             no
+13  Attribute13  Feature  Categorical        None        None  None             no
+14  Attribute14  Feature  Categorical        None        None  None             no
+15  Attribute15  Feature  Categorical        None        None  None             no
+16  Attribute16  Feature  Categorical        None        None  None             no
+17  Attribute17  Feature  Categorical        None        None  None             no
+18  Attribute18  Feature  Categorical        None        None  None             no
+19  Attribute19  Feature  Categorical        None        None  None             no
+20  Attribute20  Feature  Categorical        None        None  None             no
+21  Attribute21  Feature  Categorical        None        None  None             no
+22  Attribute22  Feature  Categorical        None        None  None             no
+23  Attribute23  Feature  Categorical        None        None  None             no
+24  Attribute24  Feature  Categorical        None        None  None             no
+25  Attribute25  Feature  Categorical        None        None  None             no
+26  Attribute26  Feature  Categorical        None        None  None             no
+27  Attribute27  Feature  Categorical        None        None  None             no
+28  Attribute28  Feature  Categorical        None        None  None             no
+29  Attribute29  Feature  Categorical        None        None  None             no
+30  Attribute30  Feature  Categorical        None        None  None             no
+31  Attribute31  Feature  Categorical        None        None  None             no
+32  Attribute32  Feature  Categorical        None        None  None             no
+33  Attribute33  Feature  Categorical        None        None  None             no
+34  Attribute34  Feature  Categorical        None        None  None             no
+35  Attribute35  Feature  Categorical        None        None  None             no
+36  Attribute36  Feature  Categorical        None        None  None             no
+37  Attribute37  Feature  Categorical        None        None  None             no
+38  Attribute38  Feature  Categorical        None        None  None            yes
+39  Attribute39  Feature  Categorical        None        None  None             no
+40  Attribute40  Feature  Categorical        None        None  None             no
+41  Attribute41  Feature  Categorical        None        None  None             no
+42  Attribute42  Feature  Categorical        None        None  None             no
+43  Attribute43  Feature  Categorical        None        None  None             no
+44  Attribute44  Feature  Categorical        None        None  None             no
+45  Attribute45  Feature  Categorical        None        None  None             no
+46  Attribute46  Feature  Categorical        None        None  None             no
+47  Attribute47  Feature  Categorical        None        None  None             no
+48  Attribute48  Feature  Categorical        None        None  None             no
+49  Attribute49  Feature  Categorical        None        None  None             no
+50  Attribute50  Feature  Categorical        None        None  None             no
+51  Attribute51  Feature  Categorical        None        None  None             no
+52  Attribute52  Feature  Categorical        None        None  None             no
+53  Attribute53  Feature  Categorical        None        None  None             no
+54  Attribute54  Feature  Categorical        None        None  None             no
+55  Attribute55  Feature  Categorical        None        None  None             no
+56  Attribute56  Feature  Categorical        None        None  None             no
+(Lung_cancer) Dropped rows with NA: 5
+    Attribute1  Attribute2  Attribute3  Attribute4  Attribute5  Attribute6  ...  Attribute52  Attribute53  Attribute54  Attribute55  Attribute56  class
+1            0           3           3         1.0           0           3  ...            2            2            1            2            2      1 
+2            0           3           3         2.0           0           3  ...            2            2            2            1            2      1 
+3            0           2           3         2.0           1           3  ...            2            2            2            2            2      1 
+4            0           3           2         1.0           1           3  ...            2            2            1            2            2      1 
+5            0           3           3         2.0           0           3  ...            2            2            2            1            2      1 
+6            0           3           2         1.0           0           3  ...            2            2            2            1            2      1 
+7            0           2           2         1.0           0           3  ...            2            2            1            2            2      1 
+8            0           3           1         1.0           0           3  ...            2            2            1            2            2      1 
+9            0           2           3         2.0           0           2  ...            2            1            1            2            2      2 
+10           0           2           2         0.0           0           3  ...            2            2            2            2            2      2 
+
+[10 rows x 57 columns]
+Preprocessed columns:  ['Attribute1', 'Attribute2', 'Attribute3', 'Attribute4', 'Attribute5', 'Attribute6', 'Attribute7', 'Attribute8', 'Attribute9', 'Attribute10', 'Attribute11', 'Attribute12', 'Attribute13', 'Attribute14', 'Attribute15', 'Attribute16', 'Attribute17', 'Attribute18', 'Attribute19', 'Attribute20', 'Attribute21', 'Attribute22', 'Attribute23', 'Attribute24', 'Attribute25', 'Attribute26', 'Attribute27', 'Attribute28', 'Attribute29', 'Attribute30', 'Attribute31', 'Attribute32', 'Attribute33', 'Attribute34', 'Attribute35', 'Attribute36', 'Attribute37', 'Attribute38', 'Attribute39', 'Attribute40', 'Attribute41', 'Attribute42', 'Attribute43', 'Attribute44', 'Attribute45', 'Attribute46', 'Attribute47', 'Attribute48', 'Attribute49', 'Attribute50', 'Attribute51', 'Attribute52', 'Attribute53', 'Attribute54', 'Attribute55', 'Attribute56', 'class']
+
+Grouped features (maximally dissimilar):
+ Group 0: ['Attribute55', 'Attribute47', 'Attribute21', 'Attribute40', 'Attribute5', 'Attribute24', 'Attribute2', 'Attribute37', 'Attribute16', 'Attribute42', 'Attribute3', 'Attribute29']
+ Group 1: ['Attribute9', 'Attribute33', 'Attribute50', 'Attribute18', 'Attribute53', 'Attribute44', 'Attribute28', 'Attribute7', 'Attribute39', 'Attribute30', 'Attribute15']
+ Group 2: ['Attribute17', 'Attribute10', 'Attribute52', 'Attribute54', 'Attribute23', 'Attribute6', 'Attribute46', 'Attribute49', 'Attribute31', 'Attribute51', 'Attribute25']
+ Group 3: ['Attribute20', 'Attribute43', 'Attribute56', 'Attribute11', 'Attribute27', 'Attribute4', 'Attribute19', 'Attribute36', 'Attribute13', 'Attribute35', 'Attribute26']
+ Group 4: ['Attribute1', 'Attribute48', 'Attribute12', 'Attribute45', 'Attribute14', 'Attribute41', 'Attribute22', 'Attribute8', 'Attribute34', 'Attribute32', 'Attribute38']

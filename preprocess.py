@@ -32,7 +32,7 @@ def preprocess_all(needs_normalisation=False, needs_encoding=True):
 
 # === Core Preprocessing Logic ===
 
-def preprocess(name, needs_normalisation=False, needs_encoding=True, log=False):
+def preprocess(name, needs_normalisation=False, needs_encoding=True, log=True):
     """
     Loads and preprocesses a dataset based on its name.
 
@@ -84,7 +84,10 @@ def preprocess(name, needs_normalisation=False, needs_encoding=True, log=False):
         data = normalise(data, numeric_cols)
 
     cols = list(data.columns)
-    print("Columns in DataFrame:", cols)
+    if log:
+        print(data.head(n=10))
+        print("Preprocessed columns: ", cols)
+
     return data, cols
 
 
@@ -210,7 +213,7 @@ def normalise(data, cols_to_normalize):
 # === Dataset-specific Handlers ===
 
 def process_Breast_cancer(data):
-    nominal_features = ["ID", "Diagnosis"]
+    nominal_features = ["Diagnosis"]
     data = encode_all_nominal(data, nominal_features)
     return data, []
 
