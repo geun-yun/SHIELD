@@ -1,2 +1,2 @@
 # SHIELD
-**SH**apley-based **I**nformation-theoretic model for **E**quitable **L**earning via **D**issimilarity
+**SH**apley-based **I**nformation-theoretic framework for **E**quitable **L**earning via **D**issimilarity
