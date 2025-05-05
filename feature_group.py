@@ -6,6 +6,8 @@ from pyitlib import discrete_random_variable as drv
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 def group_similar(data: pd.DataFrame):
     raise NotImplementedError
@@ -36,11 +38,17 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
             cmi = drv.information_mutual_conditional(x, y, z)
             h_x = drv.entropy(x)
             h_y = drv.entropy(y)
-            normalized_cmi = cmi / (h_x + h_y + 1e-9)
-            dissim = 1 - normalized_cmi
+            normalized_cmi = cmi # / (h_x + h_y + 1e-9)
+            dissim = normalized_cmi
             dissimilarity[i, j] = dissim
             dissimilarity[j, i] = dissim
-
+    print(dissimilarity)
+    sns.heatmap(dissimilarity, xticklabels=features, yticklabels=features)
+    plt.title("Conditional Mutual Information (CMI) Heatmap")
+    plt.xticks(rotation=90)  # Optional: rotate x-axis labels for readability
+    plt.yticks(rotation=0)
+    plt.tight_layout()
+    plt.show()
     # Step 2: Greedy grouping to maximize diversity
     groups = {i: [] for i in range(num_groups)}
     assigned = set()

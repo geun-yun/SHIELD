@@ -1,0 +1,95 @@
+race not missing:  99493
+race missing:  2273
+imputed_method: drop.na()
+
+weight not missing:  3197
+weight missing:  98569_
+method: feature removal
+
+payer_code not missing:  61510
+payer_code missing:  40256
+imputed_method: xgboost classifier
+
+medical_specialty not missing:  51817
+medical_specialty missing:  49949
+imputed_method: xgboost classifier
+
+diag_1 not missing:  101745
+diag_1 missing:  21
+method: drop.na()
+
+diag_2 not missing:  101408
+diag_2 missing:  358
+method: drop.na()
+
+diag_3 not missing:  100343
+diag_3 missing:  1423
+method: drop.na()
+
+max_glu_serum not missing:  5346
+max_glu_serum missing:  96420
+imputed_method: xgboost classifier
+
+A1Cresult not missing:  17018
+A1Cresult missing:  84748
+imputed_method: xgboost classifier
+
+101766 -> 98193 (96.5% preserved) after the above dropna()/drop()/imputation
+
+Unique encounters: 101766
+Unique patients: 71518
+
+       patient_nbr  number_diagnoses diag_1  diag_2  diag_3 max_glu_serum A1Cresult
+4267           135                 8    401     997     560           NaN       NaN
+4780           135                 5    998      41     250           NaN       NaN
+1164          1152                 2    282  250.01     NaN           NaN       NaN
+5953          1152                 6    282     794     250           NaN       NaN
+14180         1152                 9    282     276     428           NaN       NaN
+23623         1152                 2    282     250     NaN           NaN       NaN
+24642         1152                 5    282     287     466           NaN       NaN
+15848         1314                 9    996     411     401           NaN       NaN
+19765         1314                 7    414     411  250.01           NaN       NaN
+19914         1314                 7     78     250     414           NaN       NaN
+1083          5220                 9    276     426     558           NaN       NaN
+6901          5220                 9    404     427     276           NaN        >8
+14128         5220                 9    682  250.41     403           NaN       NaN
+16105         5220                 9  250.7     707     428           NaN       NaN
+2001          5337                 9    434     342     250           NaN        >8
+2941          5337                 5    434  250.01     342           NaN       NaN
+15980         6696                 5    530     198     250           NaN       NaN
+23541         6696                 9    486     491     198           NaN       NaN
+18558        10827                 9    434     496     250           NaN       NaN
+20078        10827                 9    398     416     396           NaN       NaN
+7665         11394                 9     38     599  250.02           NaN        >8
+13674        11394                 9    211     560     280           NaN       NaN
+18390        11394                 9    599     280     403           NaN       NaN
+5123         11511                 9    428     276     427           NaN       NaN
+5302         11511                 9    428     425     427           NaN       NaN
+5529         11511                 9    428     425     427           NaN       NaN
+7923         11511                 9    428     425     424           NaN       NaN
+318          12447                 9    486     428     427           NaN       NaN
+1309         12447                 7    402     424     427           NaN      Norm
+16346        12447                 9    733     599     428           NaN        >8
+18902        12447                 9    574     581     203           NaN      Norm
+630          13041                 9    812     285     428           NaN       NaN
+2529         13041                 9    433     428     403           NaN       NaN
+2763         13041                 9    780     577    E942           NaN       NaN
+3058         13041                 9    433     428  250.01           NaN       NaN
+5196         13041                 9    577     403     443           NaN       NaN
+8291         13041                 9     38     599     585           NaN       NaN
+19259        13041                 9    576     250     V12           NaN       NaN
+21385        13041                 9    682   250.7  250.41           NaN       NaN
+31576        16425                 5    780     250     401           NaN        >8
+34690        16425                 4    780     250     401           NaN       NaN
+2610         18765                 9    414     411     276           NaN       NaN
+8177         18765                 5    414     414     272           NaN       NaN
+21847        18765                 8    414     411     414           NaN       NaN
+23289        18765                 9    780     599     401           NaN       NaN
+24179        20232                 9    486     196     428           NaN       NaN
+24822        20232                 9    599  250.02      41           NaN       NaN
+375          20295                 9  250.7     785     682           NaN        >8
+7904         20295                 9  250.7     440     428           NaN        >8
+11068        20997                 7    401     250     272           NaN       NaN
+
+
+101766 -> 98193 (96.5% preserved)
