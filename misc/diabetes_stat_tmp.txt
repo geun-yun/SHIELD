@@ -3,16 +3,16 @@ race missing:  2273
 imputed_method: drop.na()
 
 weight not missing:  3197
-weight missing:  98569_
+weight missing:  98569
 method: feature removal
 
 payer_code not missing:  61510
 payer_code missing:  40256
-imputed_method: xgboost classifier
+imputed_method: xgboost classifier / label propagation
 
 medical_specialty not missing:  51817
 medical_specialty missing:  49949
-imputed_method: xgboost classifier
+imputed_method: xgboost classifier / label propagation
 
 diag_1 not missing:  101745
 diag_1 missing:  21
@@ -28,11 +28,11 @@ method: drop.na()
 
 max_glu_serum not missing:  5346
 max_glu_serum missing:  96420
-imputed_method: xgboost classifier
+imputed_method: xgboost classifier / label propagation
 
 A1Cresult not missing:  17018
 A1Cresult missing:  84748
-imputed_method: xgboost classifier
+imputed_method: xgboost classifier / label propagation
 
 101766 -> 98193 (96.5% preserved) after the above dropna()/drop()/imputation
 

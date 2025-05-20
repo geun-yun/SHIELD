@@ -8,6 +8,9 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 import seaborn as sns
 import matplotlib.pyplot as plt
+from scipy.linalg import eigh
+from sklearn.manifold import MDS
+
 
 def group_similar(data: pd.DataFrame):
     raise NotImplementedError
@@ -38,7 +41,7 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
             cmi = drv.information_mutual_conditional(x, y, z)
             h_x = drv.entropy(x)
             h_y = drv.entropy(y)
-            normalized_cmi = cmi # / (h_x + h_y + 1e-9)
+            normalized_cmi = cmi / (h_x + h_y + 1e-9)
             dissim = normalized_cmi
             dissimilarity[i, j] = dissim
             dissimilarity[j, i] = dissim
@@ -49,6 +52,30 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
     plt.yticks(rotation=0)
     plt.tight_layout()
     plt.show()
+    
+    ####################################################
+    is_psd, G, eigenvals = is_euclidean_distance_matrix(dissimilarity)
+
+    if is_psd:
+        print("✅ The distance matrix is Euclidean — it can be embedded in 2D (possibly with low error).")
+    else:
+        print("⚠️ The distance matrix is not strictly Euclidean — 2D embedding will involve distortion.")
+
+    mds = MDS(n_components=3, dissimilarity='precomputed', random_state=42)
+    coords = mds.fit_transform(dissimilarity)
+
+    # Plotting
+    fig = plt.figure(figsize=(10, 7))
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(coords[:, 0], coords[:, 1], coords[:, 2], s=100)
+
+    for i, label in enumerate(features):  # replace with your labels
+        ax.text(coords[i, 0], coords[i, 1], coords[i, 2], label, fontsize=10)
+
+    ax.set_title("3D MDS Projection of Distance Matrix")
+    plt.tight_layout()
+    plt.show()
+    ####################################################
     # Step 2: Greedy grouping to maximize diversity
     groups = {i: [] for i in range(num_groups)}
     assigned = set()
@@ -118,3 +145,60 @@ def create_group_autoencoders(data: pd.DataFrame, groups: dict, encoding_dim: in
 
 
     return group_embeddings
+
+
+def is_euclidean_distance_matrix(D):
+    """
+    Check whether a distance matrix D is Euclidean by computing its Gram matrix,
+    and plot the cumulative explained variance from its eigenvalues in descending order.
+    """
+    # Double centering: G = -0.5 * H D^2 H
+    n = D.shape[0]
+    H = np.eye(n) - np.ones((n, n)) / n
+    D_squared = D ** 2
+    G = -0.5 * H @ D_squared @ H
+
+    # Compute eigenvalues
+    eigenvals = eigh(G, eigvals_only=True)
+    print("Eigenvalues of Gram matrix:", eigenvals)
+
+    # Filter and sort positive eigenvalues in descending order
+    eigenvals_pos = np.sort(eigenvals[eigenvals > 0])[::-1]
+    explained_top3 = np.sum(eigenvals_pos[:3]) / np.sum(eigenvals_pos)
+    print(f"Top 3 dimensions explain {explained_top3:.2%} of total positive variance.")
+
+    # Explained variance
+    explained_variance_ratio = eigenvals_pos / np.sum(eigenvals_pos)
+    cumulative_variance = np.cumsum(explained_variance_ratio)
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.bar(range(1, len(explained_variance_ratio) + 1),
+           explained_variance_ratio,
+           alpha=0.6,
+           color='coral',
+           label='Individual Component Variance')
+
+    ax.plot(range(1, len(cumulative_variance) + 1),
+            cumulative_variance,
+            marker='o',
+            color='deepskyblue',
+            label='Cumulative Variance')
+
+    for i, val in enumerate(cumulative_variance):
+        ax.text(i + 1, val + 0.015, f"{int(val * 100)}%", ha='center', fontsize=9)
+
+    ax.set_xticks(range(1, len(explained_variance_ratio) + 1))
+    ax.set_xlabel("Principal Component Number (Most to Least)")
+    ax.set_ylabel("Explained Variance")
+    ax.set_title("Cumulative Explained Variance Plot (Descending Order)")
+    ax.set_ylim(0, 1.1)
+    ax.legend()
+    ax.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+    is_psd = np.all(eigenvals >= -1e-8)
+    return is_psd, G, eigenvals
+
+
