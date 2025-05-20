@@ -1,7 +1,8 @@
+import pandas as pd
+from typing import List
 from sklearn.preprocessing import StandardScaler
 
-
-def normalise(data, cols_to_normalize):
+def normalise(data: pd.DataFrame, cols_to_normalize: List[str]) -> pd.DataFrame:
     """
     Applies standard scaling to specified columns.
 
