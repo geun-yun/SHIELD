@@ -51,9 +51,3 @@ def train_and_test(model, train_data, test_data, num_groups=5, encoding_dim=1, t
 
     # # # Evaluate SHAP
     # # evaluate_shap(X_train, y_train, X_test, dataset_name)
-
-
-run_pipeline("Obesity")
-run_pipeline("Breast_cancer")
-# run_full_pipeline("Heart_disease")
-run_pipeline("Lung_cancer")
