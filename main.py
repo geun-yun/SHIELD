@@ -1,5 +1,5 @@
-from preprocess import preprocess
-from feature_group import group_dissimilar, create_group_autoencoders
+from preprocess.preprocess_main import preprocess
+from train.feature_group import group_dissimilar, create_group_autoencoders
 from evaluate import evaluate_metrics, evaluate_shap
 
 from sklearn.model_selection import train_test_split
@@ -45,5 +45,5 @@ def run_full_pipeline(dataset_name, num_groups=5, encoding_dim=1, test_size=0.2,
 
 run_full_pipeline("Obesity")
 run_full_pipeline("Breast_cancer")
-run_full_pipeline("Heart_disease")
+# run_full_pipeline("Heart_disease")
 run_full_pipeline("Lung_cancer")
