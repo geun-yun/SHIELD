@@ -1,10 +1,18 @@
-from preprocess.preprocess_main import preprocess
+from preprocess.preprocess_main import preprocess_all
 from train.feature_group import group_dissimilar, create_group_autoencoders
+from train.models import get_models
 from evaluate import evaluate_metrics, evaluate_shap
 
 from sklearn.model_selection import train_test_split
 
-def run_full_pipeline(dataset_name, num_groups=5, encoding_dim=1, test_size=0.2, random_state=42):
+def run_full_pipeline():
+    models = get_models()
+    for model in models.keys():
+        datasets = list(preprocess_all(model))
+        for train_data, test_data in datasets:
+            train_and_test(model, train_data, test_data)
+
+def train_and_test(model, train_data, test_data, num_groups=5, encoding_dim=1, test_size=0.2, random_state=42):
     """
     Complete pipeline that:
     1. Preprocesses the dataset
@@ -20,11 +28,13 @@ def run_full_pipeline(dataset_name, num_groups=5, encoding_dim=1, test_size=0.2,
     - test_size: float, test split ratio
     - random_state: int, seed for reproducibility
     """
-    print(f"\n==== Running pipeline for: {dataset_name} ====")
-    data, _ = preprocess(dataset_name, needs_normalisation=False, needs_encoding=True)
-
+    print(f"\n==== Running pipeline for: {model} ====")
+    train_X = train_data[:-1]
+    train_Y = train_data[-1]
+    test_X = test_data[:-1]
+    test_Y = test_data[-1]
     # Group features and encode
-    groups = group_dissimilar(data, num_groups=num_groups)
+    groups = group_dissimilar(train_data, num_groups=num_groups)
     # encoded_data = create_group_autoencoders(data, groups, encoding_dim=encoding_dim)
 
     # # # Add the target column back
@@ -43,7 +53,7 @@ def run_full_pipeline(dataset_name, num_groups=5, encoding_dim=1, test_size=0.2,
     # # evaluate_shap(X_train, y_train, X_test, dataset_name)
 
 
-run_full_pipeline("Obesity")
-run_full_pipeline("Breast_cancer")
+run_pipeline("Obesity")
+run_pipeline("Breast_cancer")
 # run_full_pipeline("Heart_disease")
-run_full_pipeline("Lung_cancer")
+run_pipeline("Lung_cancer")

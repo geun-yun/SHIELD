@@ -6,49 +6,72 @@ Includes encoding, normalization, and handling missing values.
 from ucimlrepo import fetch_ucirepo 
 import pandas as pd
 import numpy as np
-from encode import encode_datasets
-from handle_missing_values import deal_data_with_na
-from normalise import normalise
-import time
+from typing import Tuple, List
+from preprocess.encode import encode_datasets
+from preprocess.handle_missing_values import deal_data_with_na
+from preprocess.normalise import normalise
 
 # === High-level Preprocessing ===
 
-def preprocess_all(needs_normalisation=False, needs_encoding=True):
+def preprocess_all(model: str) -> Tuple[List[pd.DataFrame], ...]:
     """
-    Preprocesses all selected datasets with the specified options.
+    Preprocesses all selected datasets according to model-specific requirements.
 
     Parameters:
-    - needs_normalisation (bool): Whether to normalize numeric features.
-    - needs_encoding (bool): Whether to encode categorical variables.
+    - model (str): Name of the model which determines the preprocessing steps.
 
     Returns:
-    - Tuple of preprocessed datasets and their column names.
+    - Tuple of [train_data, test_data] for each dataset.
     """
-    breast_cancer = preprocess("Breast_cancer", needs_normalisation, needs_encoding)
-    heart_disease = preprocess("Heart_disease", needs_normalisation, needs_encoding)
-    lung_cancer = preprocess("Lung_cancer", needs_normalisation, needs_encoding)
-    diabetes = preprocess("Diabetes", needs_normalisation, needs_encoding)
-    obesity = preprocess("Obesity", needs_normalisation, needs_encoding)
-    alzheimer = preprocess("Alzheimer", needs_normalisation, needs_encoding)
+    # Set preprocessing needs based on the model type
+    if model in ["LogisticRegression", "SVM", "MLP"]:
+        needs_encoding, needs_normalisation, needs_imputation = True, True, True
+    elif model == "RandomForest":
+        needs_encoding, needs_normalisation, needs_imputation = True, False, True
+    elif model == "XGBoost":
+        needs_encoding, needs_normalisation, needs_imputation = False, False, False
 
-    return breast_cancer, heart_disease, lung_cancer, diabetes, obesity, alzheimer
+    # Apply preprocessing for each dataset
+    breast_train, breast_test = preprocess("Breast_cancer", needs_normalisation, needs_encoding, needs_imputation)
+    heart_train, heart_test = preprocess("Heart_disease", needs_normalisation, needs_encoding, needs_imputation)
+    lung_train, lung_test = preprocess("Lung_cancer", needs_normalisation, needs_encoding, needs_imputation)
+    diabetes_train, diabetes_test = preprocess("Diabetes", needs_normalisation, needs_encoding, needs_imputation)
+    obesity_train, obesity_test = preprocess("Obesity", needs_normalisation, needs_encoding, needs_imputation)
+    alzheimer_train, alzheimer_test = preprocess("Alzheimer", needs_normalisation, needs_encoding, needs_imputation)
+    
+    return (
+        [breast_train, breast_test], 
+        [heart_train, heart_test], 
+        [lung_train, lung_test], 
+        [diabetes_train, diabetes_test], 
+        [obesity_train, obesity_test], 
+        [alzheimer_train, alzheimer_test]
+    )
+
 
 # === Core Preprocessing Logic ===
 
-def preprocess(name, needs_normalisation=False, needs_encoding=True, log=True):
+def preprocess(
+    name: str, 
+    needs_normalisation: bool, 
+    needs_encoding: bool, 
+    needs_imputation: bool, 
+    log: bool = True
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """
-    Loads and preprocesses a dataset based on its name.
+    Performs dataset-specific preprocessing including encoding, normalization, and handling missing values.
 
     Parameters:
     - name (str): Dataset name.
-    - needs_normalisation (bool): Apply normalization to numeric columns.
-    - needs_encoding (bool): Apply encoding to categorical features.
-    - log (bool): Whether to print metadata and variable info.
+    - needs_normalisation (bool): Whether to apply normalization.
+    - needs_encoding (bool): Whether to apply encoding.
+    - needs_imputation (bool): Whether to handle missing values.
+    - log (bool): If True, prints debugging/logging information.
 
     Returns:
-    - data (pd.DataFrame): Preprocessed data.
-    - cols (List[str]): List of feature and target columns.
+    - Tuple of training and testing DataFrames.
     """
+    # Dataset name to UCIMLRepo ID mapping
     name_to_id = {
         "Breast_cancer": 17,
         "Heart_disease": 45,
@@ -58,67 +81,75 @@ def preprocess(name, needs_normalisation=False, needs_encoding=True, log=True):
         "Alzheimer": 732
     }
 
+    # Load dataset
     data_raw = fetch_ucirepo(id=name_to_id.get(name))
-    print(data_raw)
     X, y = data_raw.data.features, data_raw.data.targets
-    # X = pd.concat([data_raw.data.ids[['encounter_id', 'patient_nbr']], X], axis=1)
-    print(X.head())
+
     if log:
-        print(f"({name}) Metadata:")
-        print(data_raw.metadata)
+        print(X.head()) 
         print(f"({name}) Variables:")
         print(data_raw.variables)
 
+    # Combine features and target into one DataFrame
     data_raw = pd.concat([X, y], axis=1)
-    print(list(data_raw.columns))
-    # data_raw.columns = data_raw.columns.str.strip()
-    # for feature in list(data_raw.columns):
-
-    #     df_known = data_raw[data_raw[feature].notna()]
-    #     df_missing = data_raw[data_raw[feature].isna()]
-    #     print(feature, "not missing: ", len(df_known))
-    #     print(feature, "missing: ", len(df_missing))
-    # print("Unique encounters:", len(set(list(data_raw["encounter_id"]))))
-    # print("Unique patients:", len(set(list(data_raw["patient_nbr"]))))
-    # duplicate_patients = data_raw['patient_nbr'][data_raw['patient_nbr'].duplicated(keep=False)]
-
-    # # Extract all rows with those patient_nbr values
-    # duplicate_records = data_raw[data_raw['patient_nbr'].isin(duplicate_patients)]
-    # data_sorted = duplicate_records.sort_values(by=['patient_nbr', 'encounter_id', 'number_diagnoses'] if 'encounter_id' in data_raw.columns else ['patient_nbr'])
-
-    # print(data_sorted[['race', 'weight', 'patient_nbr', 'number_diagnoses', 'diag_1', 'diag_2', 'diag_3', 'max_glu_serum', 'A1Cresult']].head(50))
+    numeric_cols = data_raw.select_dtypes(include=[np.number]).columns.tolist()
     
-    data = data_raw.dropna()
-    
-
-
-    if len(data) < 0.8 * len(data_raw):
-        # data, ordinal_features = encode_datasets(data_raw, name)
-        data = deal_data_with_na(data_raw)
-        # numeric_cols.extend(ordinal_features)
-    if log:
-        print(f"({name}) Dropped rows with NA: {len(data_raw) - len(data)}")
-
-    numeric_cols = data.select_dtypes(include=[np.number]).columns.tolist()
-
-    ordinal_features = []
+    filled_data = data_raw
     if needs_encoding:
-        data, ordinal_features = encode_datasets(data, name)
-    numeric_cols.extend(ordinal_features)
+        # Special handling for Diabetes dataset (due to more missing values)
+        if name == "Diabetes":
+            filled_data = deal_data_with_na(filled_data)
+        filled_data = filled_data.dropna()
+        filled_data, ordinal_features = encode_datasets(filled_data, name)
+        numeric_cols.extend(ordinal_features)
 
     if needs_normalisation:
-        data = normalise(data, numeric_cols)
+        filled_data = normalise(filled_data, numeric_cols)
+    
+    # Determine test fraction based on usable rows
+    testing_frac = 0.2 * len(data_raw) / len(filled_data)
 
-    cols = list(data.columns)
     if log:
-        print(data.head(n=10))
-        print("Preprocessed columns: ", cols)
+        print(f"Usable test set percentage: {100 * len(filled_data) / len(data_raw):.2f}%")
+        print(f"Testing fraction: {testing_frac}")
 
-    return data, cols
+    if testing_frac > 1:
+        raise ValueError("Clean data is too small to make up the test data.")
+    
+    # Create test set from clean data and drop from original
+    test_data = filled_data.sample(frac=testing_frac, random_state=42)
+    train_data = data_raw.drop(test_data.index)
 
+    if needs_imputation and name != "Diabetes":
+        train_data = train_data.dropna()
+   
+    if needs_encoding and name != "Diabetes":
+        train_data, _ = encode_datasets(train_data, name)
+    
+    if needs_normalisation and name != "Diabetes":
+        train_data = normalise(train_data, numeric_cols)
 
+    assert set(train_data.index).isdisjoint(test_data.index), "Overlap detected between train and test sets!"
 
+    # Reset indices for cleanliness
+    train_data = train_data.reset_index(drop=True)
+    test_data = test_data.reset_index(drop=True)
 
+    # Ensure target column is the last column
+    target_col = y.columns[0]
+    print(target_col)
+    train_cols = [col for col in train_data.columns if col != target_col] + [target_col]
+    test_cols = [col for col in test_data.columns if col != target_col] + [target_col]
+    train_data = train_data[train_cols]
+    test_data = test_data[test_cols]
 
+    if log:
+        print(f"Training data proportion: {100 * len(train_data) / len(data_raw):.2f}%")
+        print(f"Training data n={len(train_data)}:")
+        print(train_data.head(n=10))
+        print(f"Testing data proportion: {100 * len(test_data) / len(data_raw):.2f}%")
+        print(f"Testing data n={len(test_data)}:")
+        print(test_data.head(n=10))
+        print("Preprocessed columns: ", list(train_data.columns))
 
-preprocess("Diabetes")
+    return train_data, test_data

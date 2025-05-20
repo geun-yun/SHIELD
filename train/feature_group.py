@@ -1,5 +1,3 @@
-# Re-running the code after environment reset
-
 import numpy as np
 import pandas as pd
 from pyitlib import discrete_random_variable as drv
