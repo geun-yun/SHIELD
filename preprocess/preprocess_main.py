@@ -29,23 +29,23 @@ def preprocess_all(model: str) -> Tuple[List[pd.DataFrame], ...]:
     elif model == "RandomForest":
         needs_encoding, needs_normalisation, needs_imputation = True, False, True
     elif model == "XGBoost":
-        needs_encoding, needs_normalisation, needs_imputation = False, False, False
+        needs_encoding, needs_normalisation, needs_imputation = True, True, True
 
     # Apply preprocessing for each dataset
-    breast_train, breast_test = preprocess("Breast_cancer", needs_normalisation, needs_encoding, needs_imputation)
+    # breast_train, breast_test = preprocess("Breast_cancer", needs_normalisation, needs_encoding, needs_imputation)
     heart_train, heart_test = preprocess("Heart_disease", needs_normalisation, needs_encoding, needs_imputation)
-    lung_train, lung_test = preprocess("Lung_cancer", needs_normalisation, needs_encoding, needs_imputation)
-    diabetes_train, diabetes_test = preprocess("Diabetes", needs_normalisation, needs_encoding, needs_imputation)
-    obesity_train, obesity_test = preprocess("Obesity", needs_normalisation, needs_encoding, needs_imputation)
-    alzheimer_train, alzheimer_test = preprocess("Alzheimer", needs_normalisation, needs_encoding, needs_imputation)
+    # lung_train, lung_test = preprocess("Lung_cancer", needs_normalisation, needs_encoding, needs_imputation)
+    # diabetes_train, diabetes_test = preprocess("Diabetes", needs_normalisation, needs_encoding, needs_imputation)
+    # obesity_train, obesity_test = preprocess("Obesity", needs_normalisation, needs_encoding, needs_imputation)
+    # alzheimer_train, alzheimer_test = preprocess("Alzheimer", needs_normalisation, needs_encoding, needs_imputation)
     
     return (
-        [breast_train, breast_test], 
+        # [breast_train, breast_test], 
         [heart_train, heart_test], 
-        [lung_train, lung_test], 
-        [diabetes_train, diabetes_test], 
-        [obesity_train, obesity_test], 
-        [alzheimer_train, alzheimer_test]
+        # [lung_train, lung_test], 
+        # [diabetes_train, diabetes_test], 
+        # [obesity_train, obesity_test], 
+        # [alzheimer_train, alzheimer_test]
     )
 
 
@@ -84,6 +84,12 @@ def preprocess(
     # Load dataset
     data_raw = fetch_ucirepo(id=name_to_id.get(name))
     X, y = data_raw.data.features, data_raw.data.targets
+    print(y)
+    # # Ensure target is discrete for classification
+    # for col in y.columns:
+    #     # Convert to integer labels if float or object type and <= 20 unique values
+    #     if y[col].dtype in [np.float64, object] and y[col].nunique() <= 20:
+    #         y[col] = pd.factorize(y[col])[0]
 
     if log:
         print(X.head()) 
@@ -93,7 +99,10 @@ def preprocess(
     # Combine features and target into one DataFrame
     data_raw = pd.concat([X, y], axis=1)
     numeric_cols = data_raw.select_dtypes(include=[np.number]).columns.tolist()
-    
+
+    str_cols = data_raw.select_dtypes(include=[object]).columns.tolist()
+    print(len(numeric_cols))
+    print(len(str_cols))
     filled_data = data_raw
     if needs_encoding:
         # Special handling for Diabetes dataset (due to more missing values)
@@ -104,6 +113,8 @@ def preprocess(
         numeric_cols.extend(ordinal_features)
 
     if needs_normalisation:
+        if y.columns[0] in numeric_cols:
+            numeric_cols.remove(y.columns[0])
         filled_data = normalise(filled_data, numeric_cols)
     
     # Determine test fraction based on usable rows
@@ -122,11 +133,16 @@ def preprocess(
 
     if needs_imputation and name != "Diabetes":
         train_data = train_data.dropna()
-   
+        print(train_data.isnull().any())
+        assert not train_data.isnull().any().any(), "NaNs detected in train_data even after imputation"
+
     if needs_encoding and name != "Diabetes":
         train_data, _ = encode_datasets(train_data, name)
-    
+
+
     if needs_normalisation and name != "Diabetes":
+        if y.columns[0] in numeric_cols:
+            numeric_cols.remove(y.columns[0])
         train_data = normalise(train_data, numeric_cols)
 
     assert set(train_data.index).isdisjoint(test_data.index), "Overlap detected between train and test sets!"

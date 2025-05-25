@@ -1,0 +1,139 @@
+==== Running pipeline for: LogisticRegression ====
+Eigenvalues of Gram matrix: [-8.09492357e-134  1.53092639e-001  1.53652391e-001  1.53971886e-001
+  1.54143553e-001  1.54199659e-001  1.54237766e-001  1.54275549e-001
+  1.54316121e-001  1.54430399e-001  1.54500092e-001  1.54543647e-001
+  1.54724319e-001  1.54901004e-001  1.55040688e-001  1.55261158e-001
+  1.55407047e-001  1.55651060e-001  1.55842301e-001  1.55984442e-001
+  1.56368641e-001  1.56710997e-001  1.56754581e-001  1.57124396e-001
+  1.57458976e-001  1.57976557e-001  1.58932492e-001  1.60331810e-001
+  1.63004032e-001  1.64512406e-001]
+Top 3 dimensions explain 10.78% of total positive variance.
+✅ The distance matrix is Euclidean — it can be embedded in 2D (possibly with low error).
+
+Grouped features (maximally dissimilar):
+ Group 0: ['symmetry1', 'perimeter1', 'area1', 'concavity1', 'area3', 'compactness2']
+ Group 1: ['smoothness3', 'perimeter3', 'concavity2', 'symmetry3', 'compactness1', 'symmetry2']
+ Group 2: ['radius1', 'texture1', 'concavity3', 'smoothness1', 'smoothness2', 'texture2']
+ Group 3: ['concave_points3', 'area2', 'compactness3', 'texture3', 'fractal_dimension1', 'concave_points2']
+ Group 4: ['radius3', 'concave_points1', 'radius2', 'perimeter2', 'fractal_dimension2', 'fractal_dimension3']
+
+[group_dissimilar] Evaluation:
+ - Average Diversity:  1.3971
+ - Minimum Dispersion: 0.5549
+
+K-Plus Anticlustering - Feature Groups:
+ Group 0: ['radius2', 'perimeter2', 'smoothness2']
+ Group 1: ['radius1', 'perimeter1', 'area1', 'concavity1', 'concave_points1', 'radius3', 'perimeter3', 'area3', 'concave_points3']
+ Group 2: ['smoothness1', 'compactness1', 'symmetry1', 'fractal_dimension1', 'compactness2', 'concave_points2', 'symmetry2', 'smoothness3', 'compactness3', 'concavity3', 'symmetry3']
+ Group 3: ['area2', 'concavity2', 'fractal_dimension2']
+ Group 4: ['texture1', 'texture2', 'texture3']
+
+[k_plus_anticlustering] Evaluation:
+ - Average Diversity:  3.4281
+ - Minimum Dispersion: 0.9940
+
+==== Running pipeline for: LogisticRegression ====
+Eigenvalues of Gram matrix: [3.60822483e-16 1.99250066e-01 2.15085071e-01 2.48095002e-01
+ 2.83535642e-01 4.25006735e-01 4.50509758e-01 4.58582060e-01
+ 4.74292581e-01 4.89788444e-01 5.01348041e-01 5.16509302e-01
+ 7.05399938e-01]
+Top 3 dimensions explain 34.69% of total positive variance.
+✅ The distance matrix is Euclidean — it can be embedded in 2D (possibly with low error).
+
+Grouped features (maximally dissimilar):
+ Group 0: ['thal', 'slope', 'trestbps']
+ Group 1: ['restecg', 'cp', 'thalach']
+ Group 2: ['exang', 'ca', 'chol']
+ Group 3: ['sex', 'oldpeak']
+ Group 4: ['fbs', 'age']
+
+[group_dissimilar] Evaluation:
+ - Average Diversity:  0.7861
+ - Minimum Dispersion: 0.8637
+
+K-Plus Anticlustering - Feature Groups:
+ Group 0: ['chol']
+ Group 1: ['age', 'fbs', 'restecg', 'ca']
+ Group 2: ['sex', 'thalach']
+ Group 3: ['trestbps', 'oldpeak', 'slope']
+ Group 4: ['cp', 'exang']
+
+[k_plus_anticlustering] Evaluation:
+ - Average Diversity:  0.8464
+ - Minimum Dispersion: 0.7643
+
+==== Running pipeline for: LogisticRegression ====
+Eigenvalues of Gram matrix: [3.88578059e-16 1.07652133e-01 1.12266152e-01 1.25940757e-01
+ 1.34463635e-01 1.44171030e-01 1.48531213e-01 1.56110302e-01
+ 1.57482026e-01 1.70441371e-01 1.80049001e-01 1.83968399e-01
+ 1.96498576e-01 1.98786073e-01 2.10025897e-01 2.16111563e-01
+ 2.17413799e-01 2.23884778e-01 2.32576769e-01 2.41157804e-01
+ 2.47761934e-01 2.59182027e-01 2.75764009e-01 2.82424149e-01
+ 2.86107621e-01 2.94236246e-01 3.05454392e-01 3.14995897e-01
+ 3.37106153e-01 3.42763432e-01 3.52297120e-01 3.70541471e-01
+ 3.83384520e-01 3.97094952e-01 4.09762572e-01 4.19643266e-01
+ 4.50217944e-01 4.58552561e-01 4.72770972e-01 4.95175673e-01
+ 5.04357815e-01 5.38969015e-01 5.57119119e-01 5.82611516e-01
+ 6.25895054e-01 6.93206785e-01 7.06287025e-01 7.39346194e-01
+ 7.76247036e-01 8.26725028e-01 8.75852576e-01 9.01195361e-01
+ 9.75727774e-01 1.07286360e+00 1.19057279e+00 1.53216559e+00]
+Top 3 dimensions explain 16.07% of total positive variance.
+✅ The distance matrix is Euclidean — it can be embedded in 2D (possibly with low error).
+
+Grouped features (maximally dissimilar):
+ Group 0: ['Attribute17', 'Attribute24', 'Attribute5', 'Attribute11', 'Attribute8', 'Attribute52', 'Attribute33', 'Attribute54', 'Attribute16', 'Attribute49', 'Attribute12', 'Attribute35']
+ Group 1: ['Attribute50', 'Attribute13', 'Attribute47', 'Attribute2', 'Attribute18', 'Attribute25', 'Attribute37', 'Attribute27', 'Attribute42', 'Attribute32', 'Attribute36']
+ Group 2: ['Attribute43', 'Attribute10', 'Attribute48', 'Attribute55', 'Attribute21', 'Attribute4', 'Attribute14', 'Attribute51', 'Attribute45', 'Attribute34', 'Attribute28']
+ Group 3: ['Attribute20', 'Attribute40', 'Attribute9', 'Attribute56', 'Attribute46', 'Attribute53', 'Attribute3', 'Attribute30', 'Attribute7', 'Attribute41', 'Attribute26']
+ Group 4: ['Attribute1', 'Attribute29', 'Attribute23', 'Attribute19', 'Attribute15', 'Attribute22', 'Attribute6', 'Attribute44', 'Attribute31', 'Attribute39', 'Attribute38']
+
+[group_dissimilar] Evaluation:
+ - Average Diversity:  4.7879
+ - Minimum Dispersion: 0.7491
+
+[Info] Excluded 1 constant feature(s):
+  ['Attribute1']
+
+K-Plus Anticlustering - Feature Groups:
+ Group 0: ['Attribute8', 'Attribute14', 'Attribute15', 'Attribute17', 'Attribute22', 'Attribute23', 'Attribute24', 'Attribute33']
+ Group 1: ['Attribute16', 'Attribute30', 'Attribute43', 'Attribute45', 'Attribute47', 'Attribute48', 'Attribute50', 'Attribute52', 'Attribute53']   
+ Group 2: ['Attribute9']
+ Group 3: ['Attribute18', 'Attribute19', 'Attribute20', 'Attribute37', 'Attribute39', 'Attribute40', 'Attribute41', 'Attribute42', 'Attribute44', 'Attribute46', 'Attribute49', 'Attribute55']
+ Group 4: ['Attribute2', 'Attribute3', 'Attribute4', 'Attribute5', 'Attribute6', 'Attribute7', 'Attribute10', 'Attribute11', 'Attribute12', 'Attribute13', 'Attribute21', 'Attribute25', 'Attribute26', 'Attribute27', 'Attribute28', 'Attribute29', 'Attribute31', 'Attribute32', 'Attribute34', 'Attribute35', 'Attribute36', 'Attribute38', 'Attribute51', 'Attribute54']
+
+[k_plus_anticlustering] Evaluation:
+ - Average Diversity:  6.8778
+ - Minimum Dispersion: 0.5252
+
+==== Running pipeline for: LogisticRegression ====
+Eigenvalues of Gram matrix: [7.62810767e-16 1.43824505e-01 1.68120142e-01 1.70647348e-01
+ 2.03346127e-01 2.09759127e-01 2.16183291e-01 2.22364613e-01
+ 2.28132751e-01 2.42719992e-01 2.50146382e-01 2.62444046e-01
+ 2.94951620e-01 3.65674714e-01 4.80888698e-01 4.87031626e-01
+ 4.96547917e-01 4.99407974e-01 5.65314540e-01 7.33091093e-01
+ 7.53418166e-01 7.87858576e-01 8.03162834e-01 8.46642276e-01
+ 1.49816083e+00]
+Top 3 dimensions explain 28.80% of total positive variance.
+✅ The distance matrix is Euclidean — it can be embedded in 2D (possibly with low error).
+
+Grouped features (maximally dissimilar):
+ Group 0: ['SMOKE_no', 'Gender_Male', 'SCC_no', 'MTRANS_Public_Transportation', 'FAF']
+ Group 1: ['CAEC', 'SMOKE_yes', 'CALC', 'FAVC_yes', 'FCVC']
+ Group 2: ['MTRANS_Walking', 'family_history_with_overweight_no', 'SCC_yes', 'Gender_Female', 'Age']
+ Group 3: ['MTRANS_Motorbike', 'CH2O', 'family_history_with_overweight_yes', 'MTRANS_Automobile', 'Weight']
+ Group 4: ['MTRANS_Bike', 'TUE', 'FAVC_no', 'NCP', 'Height']
+
+[group_dissimilar] Evaluation:
+ - Average Diversity:  1.9280
+ - Minimum Dispersion: 0.6925
+
+K-Plus Anticlustering - Feature Groups:
+ Group 0: ['TUE']
+ Group 1: ['MTRANS_Bike']
+ Group 2: ['Age', 'Height', 'Weight', 'NCP', 'CH2O', 'FAF']
+ Group 3: ['MTRANS_Motorbike']
+ Group 4: ['FCVC', 'CAEC', 'CALC', 'Gender_Female', 'Gender_Male', 'family_history_with_overweight_no', 'family_history_with_overweight_yes', 'FAVC_no', 'FAVC_yes', 'SMOKE_no', 'SMOKE_yes', 'SCC_no', 'SCC_yes', 'MTRANS_Automobile', 'MTRANS_Public_Transportation']
+
+[k_plus_anticlustering] Evaluation:
+ - Average Diversity:  4.5965
+ - Minimum Dispersion: 0.5000

@@ -132,7 +132,7 @@ def encode_Obesity(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
 
 def encode_Alzheimer(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     # Many features
-    data["ID"] = data["ID"].str[3:]
+    data["ID"] = data["ID"].str[3:].astype('int')
     data = encode_all_nominal(data, ["class!"])
     return data, []
 
