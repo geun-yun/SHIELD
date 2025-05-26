@@ -435,12 +435,12 @@ def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float
     trained_encoders = {}
 
     for group_id, group_feats in groups.items():
-        # 🛡️ Validate presence
+        # Validate presence
         missing = [feat for feat in group_feats if feat not in data.columns]
         if missing:
             raise ValueError(f"[Group {group_id}] Missing features in data: {missing}")
 
-        # ✳️ Ensure 2D shape: (samples, features)
+        # Ensure 2D shape: (samples, features)
         X_df = data[group_feats]
         X = X_df.to_numpy()
         if X.ndim != 2:
@@ -468,7 +468,7 @@ def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float
             model.fit(X_scaled, X_scaled)
             encoded = model.predict(X_scaled)
 
-            # 🧠 Save encoder
+            # Save encoder
             trained_encoders[group_id] = (scaler, model, best_encoding)
 
         else:
@@ -476,11 +476,11 @@ def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float
             X_scaled = scaler.transform(X)
             encoded = model.predict(X_scaled)
 
-        # 🔒 Validate output shape
+        # Validate output shape
         if encoded.shape[0] != X.shape[0]:
             raise ValueError(f"[Group {group_id}] Encoded output has shape {encoded.shape}, expected {X.shape[0]} rows")
 
-        # 📦 Store embedding
+        # Store embedding
         if encoded.ndim == 1 or encoded.shape[1] == 1:
             embeddings[f"group_{group_id}"] = encoded.ravel()
         else:

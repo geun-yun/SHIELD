@@ -73,12 +73,12 @@ def train_and_test(model, train_data, test_data, num_groups=4, encoding_dim=1, t
     y_test = encoded_test["target"]
 
     # Evaluate
-    print("\n🔍 Evaluating Model Performance")
+    print("\nEvaluating Model Performance")
     results, trained_models  = evaluate_metrics(X_train, y_train, X_test, y_test, task_name=model)
     print(results)
 
     # Optional: SHAP evaluation
-    print("\n🔍 Explaining with SHAP")
+    print("\nExplaining with SHAP")
     evaluate_shap(X_train, X_test, trained_models, task_name=model)
     # Add the target column back
     # encoded_data["target"] = data.iloc[:, -1].values
@@ -96,7 +96,7 @@ def train_and_test(model, train_data, test_data, num_groups=4, encoding_dim=1, t
     # evaluate_shap(X_train, y_train, X_test, dataset_name)
 
 def compare_grouping_methods(data, base_model, k=4, repeats=3):
-    print("\n🚩 Starting fairness-aware evaluation via K-fold CV")
+    print("\nStarting fairness-aware evaluation via K-fold CV")
 
     y = data.iloc[:, -1]
     X_raw = data.iloc[:, :-1]
@@ -113,7 +113,7 @@ def compare_grouping_methods(data, base_model, k=4, repeats=3):
     emb_results = run_kfold_cv(X_emb, y_emb, clone(base_model), k=k, repeats=repeats)
 
     # -- Compare
-    print("\n📊 Averaged Results (Raw vs Grouped)")
+    print("\nAveraged Results (Raw vs Grouped)")
     for metric in raw_results.keys():
         raw_vals = [v for v in raw_results[metric] if v is not None]
         emb_vals = [v for v in emb_results[metric] if v is not None]
