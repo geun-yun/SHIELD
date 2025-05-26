@@ -143,10 +143,10 @@ def evaluate_shap(X_train, X_test, models, task_name="Unknown", max_display=10):
         else:
             raise ValueError("X_test must be a DataFrame with named columns for SHAP group aggregation.")
 
-        # 🔢 Aggregate SHAP values by group
+        # Aggregate SHAP values by group
         grouped_shap = aggregate_shap_by_group(sv_array, feature_names)
 
-        # 📊 Plot top group importances
+        # Plot top group importances
         grouped_shap.head(max_display).plot(
             kind='bar',
             title=f"{name} - SHAP Summary by Feature Group",
