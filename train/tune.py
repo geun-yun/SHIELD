@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold
 from skopt import BayesSearchCV
 from skopt.space import Real, Integer, Categorical
+from models import get_models
 
 def get_bayes_spaces():
     return {
@@ -35,7 +36,7 @@ def get_bayes_spaces():
     }
 
 def bayes_tune_models(X_train, y_train, cv_splits=5, n_iter=30, random_state=42):
-    base_models = get_base_models(random_state)
+    base_models = get_models(random_state)
     search_spaces = get_bayes_spaces()
 
     tuned_searches = {}
