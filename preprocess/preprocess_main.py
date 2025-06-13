@@ -24,7 +24,7 @@ def preprocess_all(model: str) -> Tuple[List[pd.DataFrame], ...]:
     - Tuple of [train_data, test_data] for each dataset.
     """
     # Set preprocessing needs based on the model type
-    if model in ["LogisticRegression", "SVM", "MLP"]:
+    if model in ["LinearRegression", "LogisticRegression", "SVM", "MLP"]:
         needs_encoding, needs_normalisation, needs_imputation = True, True, True
     elif model == "RandomForest":
         needs_encoding, needs_normalisation, needs_imputation = True, False, True
@@ -33,19 +33,20 @@ def preprocess_all(model: str) -> Tuple[List[pd.DataFrame], ...]:
 
     # Apply preprocessing for each dataset
     # breast_train, breast_test = preprocess("Breast_cancer", needs_normalisation, needs_encoding, needs_imputation)
-    heart_train, heart_test = preprocess("Heart_disease", needs_normalisation, needs_encoding, needs_imputation)
+    # heart_train, heart_test = preprocess("Heart_disease", needs_normalisation, needs_encoding, needs_imputation)
     # lung_train, lung_test = preprocess("Lung_cancer", needs_normalisation, needs_encoding, needs_imputation)
     # diabetes_train, diabetes_test = preprocess("Diabetes", needs_normalisation, needs_encoding, needs_imputation)
-    # obesity_train, obesity_test = preprocess("Obesity", needs_normalisation, needs_encoding, needs_imputation)
+    obesity_train, obesity_test = preprocess("Obesity", needs_normalisation, needs_encoding, needs_imputation)
     # alzheimer_train, alzheimer_test = preprocess("Alzheimer", needs_normalisation, needs_encoding, needs_imputation)
-    
+    # crime_train, crime_test = preprocess("Crime", needs_normalisation, needs_encoding, needs_imputation)
     return (
         # [breast_train, breast_test], 
-        [heart_train, heart_test], 
+        # [heart_train, heart_test], 
         # [lung_train, lung_test], 
         # [diabetes_train, diabetes_test], 
-        # [obesity_train, obesity_test], 
-        # [alzheimer_train, alzheimer_test]
+        [obesity_train, obesity_test], 
+        # [alzheimer_train, alzheimer_test],
+        # [crime_train, crime_test]
     )
 
 
@@ -78,29 +79,27 @@ def preprocess(
         "Lung_cancer": 62,
         "Diabetes": 296,
         "Obesity": 544,
-        "Alzheimer": 732
+        "Alzheimer": 732,
+        "Crime": 183
     }
 
     # Load dataset
     data_raw = fetch_ucirepo(id=name_to_id.get(name))
     X, y = data_raw.data.features, data_raw.data.targets
+
     print(y)
-    # # Ensure target is discrete for classification
-    # for col in y.columns:
-    #     # Convert to integer labels if float or object type and <= 20 unique values
-    #     if y[col].dtype in [np.float64, object] and y[col].nunique() <= 20:
-    #         y[col] = pd.factorize(y[col])[0]
 
     if log:
         print(X.head()) 
         print(f"({name}) Variables:")
         print(data_raw.variables)
-
+    
     # Combine features and target into one DataFrame
     data_raw = pd.concat([X, y], axis=1)
-    numeric_cols = data_raw.select_dtypes(include=[np.number]).columns.tolist()
 
+    numeric_cols = data_raw.select_dtypes(include=[np.number]).columns.tolist()
     str_cols = data_raw.select_dtypes(include=[object]).columns.tolist()
+    
     print(len(numeric_cols))
     print(len(str_cols))
     filled_data = data_raw
@@ -109,6 +108,7 @@ def preprocess(
         if name == "Diabetes":
             filled_data = deal_data_with_na(filled_data)
         filled_data = filled_data.dropna()
+        print("filled", filled_data)
         filled_data, ordinal_features = encode_datasets(filled_data, name)
         numeric_cols.extend(ordinal_features)
 
@@ -135,12 +135,15 @@ def preprocess(
         train_data = train_data.dropna()
         print(train_data.isnull().any())
         assert not train_data.isnull().any().any(), "NaNs detected in train_data even after imputation"
+    elif needs_imputation:
+        train_data = deal_data_with_na(train_data)
+        assert not train_data.isnull().any().any(), "NaNs detected in train_data even after imputation"
 
-    if needs_encoding and name != "Diabetes":
+    if needs_encoding:
         train_data, _ = encode_datasets(train_data, name)
 
 
-    if needs_normalisation and name != "Diabetes":
+    if needs_normalisation:
         if y.columns[0] in numeric_cols:
             numeric_cols.remove(y.columns[0])
         train_data = normalise(train_data, numeric_cols)

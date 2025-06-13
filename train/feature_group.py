@@ -12,7 +12,8 @@ from itertools import combinations
 from scipy.spatial.distance import pdist, squareform
 from scipy.stats import skew, kurtosis
 from sklearn.cluster import KMeans
-import numpy as np
+from sklearn.metrics import mean_squared_error
+from math import comb
 
 def group_similar(data: pd.DataFrame):
     raise NotImplementedError
@@ -67,9 +68,9 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
     # is_psd, G, eigenvals = is_euclidean_distance_matrix(dissimilarity)
 
     # if is_psd:
-    #     print("✅ The distance matrix is Euclidean — it can be embedded in 2D (possibly with low error).")
+    #     print(" The distance matrix is Euclidean — it can be embedded in 2D (possibly with low error).")
     # else:
-    #     print("⚠️ The distance matrix is not strictly Euclidean — 2D embedding will involve distortion.")
+    #     print(" The distance matrix is not strictly Euclidean — 2D embedding will involve distortion.")
 
     # mds = MDS(n_components=3, dissimilarity='precomputed', random_state=42)
     # coords = mds.fit_transform(dissimilarity)
@@ -124,38 +125,6 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
     
     evaluate_grouping(groups, features.tolist(), dissimilarity, method_name="group_dissimilar")
     return groups
-
-
-def create_group_autoencoders(data: pd.DataFrame, groups: dict, encoding_dim: int = 1):
-    """
-    Create and train one hidden-layer autoencoders per feature group.
-    Parameters:
-    - data: pd.DataFrame, dataset with original features
-    - groups: dict, grouping of features from `group_dissimilar_diverse`
-    - encoding_dim: int, dimension of latent space for each group
-
-    Returns:
-    - group_embeddings: pd.DataFrame, new dataset with one column per group (encoded features)
-    """
-    group_embeddings = pd.DataFrame(index=data.index)
-    scaler = StandardScaler()
-
-    for group_id, features in groups.items():
-        X = scaler.fit_transform(data[features])
-        X_train, X_test = train_test_split(X, test_size=0.2, random_state=42)
-
-        model = MLPRegressor(hidden_layer_sizes=(encoding_dim,), activation='relu', max_iter=1000, random_state=42)
-        model.fit(X_train, X_train)
-
-        encoded = model.predict(X)
-        if encoding_dim == 1:
-            group_embeddings[f'group_{group_id}'] = encoded.ravel()
-        else:
-            for dim in range(encoded.shape[1]):
-                group_embeddings[f'group_{group_id}_dim{dim}'] = encoded[:, dim]
-
-
-    return group_embeddings
 
 
 def is_euclidean_distance_matrix(D):
@@ -217,7 +186,8 @@ def is_euclidean_distance_matrix(D):
 def diversity(group, dist_matrix):
     if len(group) < 2:
         return np.nan
-    return sum(dist_matrix[i, j] for i, j in combinations(group, 2))
+    total_pairs = comb(len(group), 2)
+    return sum(dist_matrix[i, j] for i, j in combinations(group, 2)) / total_pairs
 
 def dispersion(group, dist_matrix):
     if len(group) < 2:
@@ -236,7 +206,7 @@ def evaluate_grouping(groups: dict, feature_list: list, dist_matrix: np.ndarray,
     diversity_scores = [diversity(g, dist_matrix) for g in group_indices]
     dispersion_scores = [dispersion(g, dist_matrix) for g in group_indices]
 
-    avg_div = np.nansum(diversity_scores) / len(feature_list)
+    avg_div = np.nansum(diversity_scores)
     min_disp = np.nanmin(dispersion_scores)
 
     print(f"\n[{method_name}] Evaluation:")
@@ -421,18 +391,11 @@ def k_plus_anticlustering(data, k=5, verbose=True):
     return group_dict
 
 
-# Step 3: Create embeddings using autoencoders
-from sklearn.model_selection import train_test_split
-from sklearn.neural_network import MLPRegressor
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_squared_error
-import pandas as pd
-import numpy as np
-
 def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float = 1e-2, encoding_dim: int = 5,
                          fit: bool = True, encoders: dict = None):
     embeddings = pd.DataFrame(index=data.index)
     trained_encoders = {}
+    feature_mappings = {}
 
     for group_id, group_feats in groups.items():
         # Validate presence
@@ -466,7 +429,22 @@ def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float
             # Refit on full scaled data
             model = MLPRegressor(hidden_layer_sizes=(best_encoding,), activation='relu', max_iter=2000, random_state=42)
             model.fit(X_scaled, X_scaled)
-            encoded = model.predict(X_scaled)
+            W0, b0 = model.coefs_[0], model.intercepts_[0]
+            Z      = X_scaled.dot(W0) + b0
+            encoded = np.maximum(0, Z)
+
+            # ae.coefs_[1] has shape (best_encoding, len(group_feats))
+            W_dec = model.coefs_[1]
+            if encoding_dim == 1:
+                latent_names = [f'group_{group_id}']
+            else:
+                latent_names = [f'group_{group_id}_dim{d}' for d in range(encoding_dim)]
+            mapping_df = pd.DataFrame(
+                W_dec,
+                index=latent_names,
+                columns=group_feats
+            )
+            feature_mappings[group_id] = mapping_df
 
             # Save encoder
             trained_encoders[group_id] = (scaler, model, best_encoding)
@@ -474,7 +452,9 @@ def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float
         else:
             scaler, model, best_encoding = encoders[group_id]
             X_scaled = scaler.transform(X)
-            encoded = model.predict(X_scaled)
+            W0, b0 = model.coefs_[0], model.intercepts_[0]
+            Z      = X_scaled.dot(W0) + b0
+            encoded = np.maximum(0, Z)
 
         # Validate output shape
         if encoded.shape[0] != X.shape[0]:
@@ -491,6 +471,4 @@ def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float
         if fit:
             print(f"[Group {group_id}] Selected encoding dim: {best_encoding}")
 
-    return (embeddings, trained_encoders) if fit else embeddings
-
-
+    return (embeddings, trained_encoders, feature_mappings) if fit else embeddings
