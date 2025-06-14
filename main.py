@@ -1,7 +1,9 @@
 from preprocess.preprocess_main import preprocess_all
-from train.feature_group import evaluate_k_range, plot_k_selection, group_dissimilar, create_group_autoencoders, bicriterion_anticlustering, k_plus_anticlustering, embed_feature_groups
+from train.feature_group import evaluate_k_range, plot_k_selection, group_dissimilar, bicriterion_anticlustering, k_plus_anticlustering, embed_feature_groups
 from train.models import get_models
-from evaluate.evaluate import evaluate_metrics, fairness_metrics, evaluate_shap_features, run_kfold_cv
+from evaluate.evaluate import evaluate_metrics, run_kfold_cv
+from evaluate.SHAP import evaluate_shap_features
+from evaluate.fairness import fairness_metrics
 from sklearn.linear_model import LogisticRegression
 from sklearn.base import clone
 from sklearn.model_selection import train_test_split
