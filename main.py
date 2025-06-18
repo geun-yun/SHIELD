@@ -138,7 +138,7 @@ def train_and_test(model, train_data, test_data, num_groups=4, encoding_dim=5, t
     # sensitive = test_data['sex']
     # print("\nFairness Metrics")
     # results = fairness_metrics(y_true, y_pred, sensitive, privileged_value=1)
-    print(results)
+
     # Optional: SHAP evaluation
     print("\nExplaining with SHAP")
     # new
