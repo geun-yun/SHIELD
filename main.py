@@ -10,7 +10,22 @@ from sklearn.model_selection import train_test_split
 import pandas as pd
 import numpy as np
 from sklearn.base import clone
+import argparse
 
+def parse_args():
+    parser = argparse.ArgumentParser(description="Run feature grouping and modeling pipeline")
+    parser.add_argument("--grouping", type=str, default="ungroup", choices=["ungroup", "gd", "bicriterion", "kplus"],
+                        help="Grouping method: 'ungroup', 'gd' (greedy dissimilar), 'bicriterion', 'kplus'")
+    parser.add_argument("--model", type=str, default="LogisticRegression",
+                        help="Model to train (must match name in get_models)")
+    parser.add_argument("--dataset", type=str, default="default_dataset",
+                        help="Dataset to use (must match available datasets in preprocess_all)")
+    parser.add_argument("--k", type=int, default=5, help="Number of groups")
+    parser.add_argument("--encoding_dim", type=int, default=5, help="Latent dimension size")
+    parser.add_argument("--SHAP", type=str, default="aggregated", choices=["aggregated", "each_label"],
+                        help="SHAP analysis: 'aggregated' returns one plot, 'each_label' returns a plot for each label")
+    return parser.parse_args()
+        
 def run_full_pipeline():
     models = get_models()
     for model in models.keys():
