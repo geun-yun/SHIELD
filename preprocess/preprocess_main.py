@@ -32,20 +32,20 @@ def preprocess_all(model: str) -> Tuple[List[pd.DataFrame], ...]:
         needs_encoding, needs_normalisation, needs_imputation = True, True, True
 
     # Apply preprocessing for each dataset
-    # breast_train, breast_test = preprocess("Breast_cancer", needs_normalisation, needs_encoding, needs_imputation)
+    breast_train, breast_test = preprocess("Breast_cancer", needs_normalisation, needs_encoding, needs_imputation)
     # heart_train, heart_test = preprocess("Heart_disease", needs_normalisation, needs_encoding, needs_imputation)
     # lung_train, lung_test = preprocess("Lung_cancer", needs_normalisation, needs_encoding, needs_imputation)
     # diabetes_train, diabetes_test = preprocess("Diabetes", needs_normalisation, needs_encoding, needs_imputation)
-    obesity_train, obesity_test = preprocess("Obesity", needs_normalisation, needs_encoding, needs_imputation)
-    # alzheimer_train, alzheimer_test = preprocess("Alzheimer", needs_normalisation, needs_encoding, needs_imputation)
+    # obesity_train, obesity_test = preprocess("Obesity", needs_normalisation, needs_encoding, needs_imputation)
+    alzheimer_train, alzheimer_test = preprocess("Alzheimer", needs_normalisation, needs_encoding, needs_imputation)
     # crime_train, crime_test = preprocess("Crime", needs_normalisation, needs_encoding, needs_imputation)
     return (
         # [breast_train, breast_test], 
         # [heart_train, heart_test], 
         # [lung_train, lung_test], 
         # [diabetes_train, diabetes_test], 
-        [obesity_train, obesity_test], 
-        # [alzheimer_train, alzheimer_test],
+        # [obesity_train, obesity_test], 
+        [alzheimer_train, alzheimer_test],
         # [crime_train, crime_test]
     )
 
