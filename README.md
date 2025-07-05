@@ -3,4 +3,4 @@
 
 *This research is currently very much incomplete.* 
 
-![image info](./misc/flowchart.png)
+![image info](./misc/flowchart_300dpi.png)
