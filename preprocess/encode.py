@@ -80,21 +80,12 @@ def encode_datasets(data: pd.DataFrame, name: str) -> Tuple[pd.DataFrame, List[s
         return encode_Breast_cancer(data)
     elif name == "Heart_disease":
         return encode_Heart_disease(data)
-    elif name == "Lung_cancer":
-        return encode_Lung_cancer(data)
     elif name == "Diabetes":
         return encode_Diabetes(data)
     elif name == "Obesity":
         return encode_Obesity(data)
     elif name == "Alzheimer":
         return encode_Alzheimer(data)
-    elif name == "Crime":
-        return encode_Crime(data)
-    
-def encode_Crime(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
-    nominal_features = ["communityname"]
-    data = encode_all_nominal(data, nominal_features)
-    return data, []
 
 
 def encode_Breast_cancer(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
@@ -104,10 +95,6 @@ def encode_Breast_cancer(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
 
 
 def encode_Heart_disease(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
-    return data, []  # Already processed and numeric
-
-
-def encode_Lung_cancer(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
     return data, []  # Already processed and numeric
 
 

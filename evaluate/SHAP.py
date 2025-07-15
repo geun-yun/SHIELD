@@ -1,326 +1,319 @@
 import numpy as np
 import pandas as pd
+import seaborn as sns
+import shap
+import matplotlib.pyplot as plt
 from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
-import matplotlib.pyplot as plt
-import re
-import shap
+from sklearn.pipeline import Pipeline
+
 
 def get_shap_explainer(model, X_train):
     """
-    Selects the appropriate SHAP explainer based on model type.
+    Returns a SHAP explainer that handles Pipelines safely.
     """
-    if isinstance(model, (XGBClassifier, RandomForestClassifier)):
-        return shap.TreeExplainer(model)
-    elif isinstance(model, MLPClassifier):
-        return shap.DeepExplainer(model, X_train)
-    elif isinstance(model, (LogisticRegression, SVC)):
-        return shap.KernelExplainer(model.predict_proba, X_train)
+    estimator = model
+
+    if isinstance(model, Pipeline):
+        estimator = model.steps[-1][1]  # Get final estimator
+
+    if isinstance(estimator, (XGBClassifier, RandomForestClassifier)):
+        # Tree models work with TreeExplainer directly, but wrap Pipeline with callable
+        if isinstance(model, Pipeline):
+            f = lambda X: model.predict_proba(X)
+            return shap.Explainer(f, X_train)  # Or TreeExplainer with .model
+        else:
+            return shap.TreeExplainer(estimator)
+    elif isinstance(estimator, MLPClassifier):
+        # Neural nets → Kernel or DeepExplainer if using TF/PyTorch
+        f = lambda X: model.predict_proba(X) if hasattr(model, "predict_proba") else model.predict(X)
+        return shap.KernelExplainer(f, X_train)
+    elif isinstance(estimator, (LogisticRegression, SVC)):
+        f = lambda X: model.predict_proba(X) if hasattr(model, "predict_proba") else model.predict(X)
+        return shap.KernelExplainer(f, X_train)
     else:
-        return shap.Explainer(model, X_train)  # fallback
-    
+        # Fallback: always wrap with callable for Pipeline
+        f = lambda X: model.predict_proba(X) if hasattr(model, "predict_proba") else model.predict(X)
+        return shap.KernelExplainer(f, X_train)
 
-def decompose_shap_to_features(
-    shap_values: np.ndarray,
-    feature_names: list,
-    feature_mappings: dict
-) -> pd.DataFrame:
-    """
-    Given:
-      - shap_values: array of shape (n_samples, n_latent_dims_total)
-      - feature_names: list of column names matching shap_values' columns
-      - feature_mappings: dict[group_id] -> mapping_df (latent_dims × original_feats)
-    Returns:
-      - shap_per_feature: DataFrame (n_samples × total_original_features)
-    """
-    # wrap into DataFrame for easier slicing
-    latent_df = pd.DataFrame(shap_values, columns=feature_names)
-    all_feature_shap = []
 
-    for group_id, mapping_df in feature_mappings.items():
-        # identify the latent columns for this group
-        latent_cols = mapping_df.index.tolist()
-        # pull the shap values for them
-        latent_shap = latent_df[latent_cols].to_numpy()  # (n_samples, encoding_dim)
-
-        # normalize absolute decoder weights per feature
-        W = mapping_df.to_numpy()  # (encoding_dim, d_k)
-        w_abs = np.abs(W)
-        norm = w_abs.sum(axis=0)  # sum over latent dims → for each feature
-        # avoid division by zero
+def decompose_shap_to_features(shap_values, latent_cols, feature_mappings):
+    # Defensive: must be 2D only
+    if shap_values.ndim != 2:
+        raise ValueError(f"decompose_shap_to_features: SHAP must be 2D, got {shap_values.shape}")
+    latent_df = pd.DataFrame(shap_values, columns=latent_cols)
+    all_feats = []
+    for gid, mapping_df in feature_mappings.items():
+        group_latent_cols = mapping_df.index.tolist()
+        latent_vals = latent_df[group_latent_cols].values
+        W = mapping_df.to_numpy()
+        W_abs = np.abs(W)
+        norm = W_abs.sum(axis=0)
         norm[norm == 0] = 1.0
-        weights = w_abs / norm  # (encoding_dim, d_k) now each column sums to 1
+        weights = W_abs / norm
+        shap_feats = latent_vals @ weights
+        df = pd.DataFrame(shap_feats, columns=mapping_df.columns, index=latent_df.index)
+        all_feats.append(df)
+    return pd.concat(all_feats, axis=1)
 
-        # decompose: (n_samples × encoding_dim) dot (encoding_dim × d_k)
-        shap_feats = latent_shap.dot(weights)  # (n_samples, d_k)
 
-        # make DataFrame
-        df_feats = pd.DataFrame(
-            shap_feats,
-            columns=mapping_df.columns,
-            index=latent_df.index
-        )
-        all_feature_shap.append(df_feats)
-
-    # concatenate all groups' feature SHAP
-    shap_per_feature = pd.concat(all_feature_shap, axis=1)
-    return shap_per_feature
-
-# def evaluate_shap_features(
-#     X_train: pd.DataFrame,
-#     X_test: pd.DataFrame,
-#     trained_models: dict,
-#     encoders: dict,
-#     feature_mappings: dict,
-#     max_display: int = 10
-# ):
-#     """
-#     For each model:
-#       1. compute SHAP values on the latent group encodings
-#       2. decompose them back to individual features
-#       3. plot the top `max_display` features by mean absolute SHAP
-#     """
-#     bmis = [17.5, 21.7, 26.7, 28.4, 32.5, 37.5, 42.5]
-#     z_scores = compute_z_score(bmis, 24, 4.5)
-#     if not encoders:
-#         for name, model in trained_models.items():
-#             print(f"\nSHAP (raw) → {name}")
-#             print(f"Class order in SHAP for model '{name}': {model.classes_}")
-#             # background = kmeans on X_train
-#             bg_k = min(200, X_train.shape[0])
-#             bg   = shap.kmeans(X_train, bg_k)
-#             explainer = shap.KernelExplainer(model.predict_proba, bg)
-#             shap_values = explainer(X_test)
-#             # if multiclass
-#             vals = shap_values.values if hasattr(shap_values, "values") else shap_values
-#             if vals.ndim == 3:
-#                 vals = np.tensordot(vals, z_scores, axes=([2], [0]))
-#             shap.summary_plot(
-#                 vals, 
-#                 X_test, 
-#                 feature_names=X_test.columns.tolist(),
-#                 plot_type="dot", 
-#                 max_display=max_display, 
-#                 show=False
-#             )
-#             plt.title(f"{name} – SHAP (raw)")
-#             plt.tight_layout()
-#             plt.show()
-#         return
-#     # first, transform X_train/X_test via the same autoencoders to get latent features
-#     # assume user has already obtained `group_embeddings_train, encoders, mappings`
-#     # and `group_embeddings_test` via the same call to create_group_autoencoders.
-#     # Here we just get `X_test_latent` and `latent_feature_names`.
-#     latent_cols = []
-#     X_test_latent = pd.DataFrame(index=X_test.index)
-
-#     for gid, (scaler, ae, _) in encoders.items():
-#         feats = feature_mappings[gid].columns.tolist()
-#         enc_dim = ae.coefs_[1].shape[0]
-#         X_scaled = scaler.transform(X_test[feats].to_numpy())
-#         W0, b0 = ae.coefs_[0], ae.intercepts_[0]
-#         Z = X_scaled.dot(W0) + b0
-#         if ae.activation == 'relu':
-#             codes = np.maximum(0, Z)
-#         elif ae.activation == 'identity':
-#             codes = Z
-#         elif ae.activation == 'logistic':
-#             codes = 1.0 / (1.0 + np.exp(-Z))
-#         elif ae.activation == 'tanh':
-#             codes = np.tanh(Z)
-#         else:
-#             raise ValueError(f"Unsupported activation: {ae.activation}")
-        
-#         if enc_dim == 1:
-#             col = f'group_{gid}'
-#             X_test_latent[col] = codes.ravel()
-#             latent_cols.append(col)
-#         else:
-#             for d in range(enc_dim):
-#                 col = f'group_{gid}_dim{d}'
-#                 X_test_latent[col] = codes[:, d]
-#                 latent_cols.append(col)
-
-#     # run SHAP on latent space
-#     for name, model in trained_models.items():
-#         print(f"\nSHAP → individual features: {name}")
-#         print(f"Class order in SHAP for model '{name}': {model.classes_}")
-#         # If this would be a KernelExplainer, use a small background for speed
-#         if isinstance(model, (LogisticRegression, SVC, MLPClassifier)):
-#             # choose k cluster centers (e.g. 50) or drop-in shap.sample(X_train, 200)
-#             bg_size = min(50, X_train.shape[0])
-#             bg = shap.kmeans(X_train, bg_size)
-#             explainer = shap.KernelExplainer(model.predict_proba, bg)
-#         else:
-#             # TreeExplainer, DeepExplainer, etc., untouched
-#             explainer = get_shap_explainer(model, X_train)
-
-#         shap_vals = explainer(X_test_latent)
-#         # get raw array
-#         raw = shap_vals.values if hasattr(shap_vals, 'values') else shap_vals
-#         if raw.ndim == 3:
-#             print(raw)
-#             raw = np.tensordot(raw, z_scores, axes=([2], [0]))
-
-#         # decompose back to original features
-#         shap_feat_df = decompose_shap_to_features(
-#             raw, latent_cols, feature_mappings
-#         )
-
-#         # aggregate mean absolute
-#         mean_abs = shap_feat_df.mean().sort_values(ascending=False)
-#         top = mean_abs.head(max_display)
-
-#         shap.summary_plot(
-#             shap_feat_df.values,                        # numpy array (n_samples, n_features)
-#             X_test[shap_feat_df.columns],               # DataFrame of the same original features
-#             plot_type="dot",                            # the classic beeswarm
-#             max_display=max_display,                    # how many features to show
-#             color_bar=True                              # show the color legend
-#         )
-
-def evaluate_shap_features(
-    X_train: pd.DataFrame,
-    X_test: pd.DataFrame,
-    trained_models: dict,
-    encoders: dict,
-    feature_mappings: dict,
-    max_display: int = 10
-):
-    """
-    For each model:
-      - If no encoders: compute per‐class SHAP on raw features
-      - Otherwise:
-          1. compute per‐class SHAP values on the latent group encodings
-          2. decompose them back to individual features
-          3. plot the top `max_display` features by mean absolute SHAP for each class
-    """
-    # —— RAW FEATURES CASE ——
-    if not encoders:
-        for name, model in trained_models.items():
-            print(f"\nSHAP (raw) → {name}")
-            bg_k = min(200, X_train.shape[0])
-            bg   = shap.kmeans(X_train, bg_k)
-            explainer = shap.KernelExplainer(model.predict_proba, bg)
-            shap_out = explainer(X_test)
-            vals = shap_out.values if hasattr(shap_out, "values") else shap_out
-
-            # multiclass?
-            if vals.ndim == 3:
-                n_classes = vals.shape[2]
-                for c in range(n_classes):
-                    class_vals = vals[:, :, c]
-                    shap.summary_plot(
-                        class_vals,
-                        X_test,
-                        feature_names=X_test.columns.tolist(),
-                        plot_type="dot",
-                        max_display=max_display,
-                        show=False
-                    )
-                    plt.title(f"{name} – SHAP (raw) for class {c}")
-                    plt.tight_layout()
-                    plt.show()
-            else:
-                # binary or single‐output
-                shap.summary_plot(
-                    vals,
-                    X_test,
-                    feature_names=X_test.columns.tolist(),
-                    plot_type="dot",
-                    max_display=max_display,
-                    show=False
-                )
-                plt.title(f"{name} – SHAP (raw)")
+def plot_shap_raw(vals, X_test, feature_names, model_name, mode, z_scores, max_display):
+    if vals.ndim == 3:
+        n_classes = vals.shape[2]
+        if mode == "each_label":
+            for c in range(n_classes):
+                shap.summary_plot(vals[:, :, c], X_test, feature_names=feature_names,
+                                  plot_type="dot", max_display=max_display, show=False)
+                plt.title(f"{model_name} – SHAP (raw) for class {c}")
                 plt.tight_layout()
                 plt.show()
-        return
+        elif mode == "aggregated":
+            agg_vals = (np.tensordot(vals, z_scores, axes=([2], [0]))
+                        if z_scores is not None else np.sum(np.abs(vals), axis=2))
+            shap.summary_plot(agg_vals, X_test, feature_names=feature_names,
+                              plot_type="dot", max_display=max_display, show=False)
+            plt.title(f"{model_name} – SHAP (raw, aggregated)")
+            plt.tight_layout()
+            plt.show()
+    else:
+        shap.summary_plot(vals, X_test, feature_names=feature_names,
+                          plot_type="dot", max_display=max_display, show=False)
+        plt.title(f"{model_name} – SHAP (raw)")
+        plt.tight_layout()
+        plt.show()
 
-    # —— GROUPED FEATURES CASE ——
-    # first compute the latent encodings for X_test
+
+def plot_shap_grouped(raw, X_test, latent_cols, feature_mappings, model_name, mode, z_scores, max_display):
+    if raw.ndim == 3:
+        n_classes = raw.shape[2]
+        if mode == "each_label":
+            for c in range(n_classes):
+                slice_raw = raw[:, :, c]  # (n_samples, n_latent)
+                shap_df = decompose_shap_to_features(slice_raw, latent_cols, feature_mappings)
+                shap.summary_plot(shap_df.values, X_test[shap_df.columns],
+                                  plot_type="dot", max_display=max_display, show=False)
+                plt.title(f"{model_name} – SHAP decomposed for class {c}")
+                plt.tight_layout()
+                plt.show()
+        elif mode == "aggregated":
+            agg = (np.tensordot(raw, z_scores, axes=([2], [0]))
+                   if z_scores is not None else np.sum(np.abs(raw), axis=2))
+            shap_df = decompose_shap_to_features(agg, latent_cols, feature_mappings)
+            shap.summary_plot(shap_df.values, X_test[shap_df.columns],
+                              plot_type="dot", max_display=max_display, show=False)
+            plt.title(f"{model_name} – SHAP decomposed aggregated")
+            plt.tight_layout()
+            plt.show()
+    else:
+        shap_df = decompose_shap_to_features(raw, latent_cols, feature_mappings)
+        shap.summary_plot(shap_df.values, X_test[shap_df.columns],
+                          plot_type="dot", max_display=max_display, show=False)
+        plt.title(f"{model_name} – SHAP decomposed")
+        plt.tight_layout()
+        plt.show()
+
+
+def prepare_latent(X_test, encoders, feature_mappings):
     latent_cols = []
     X_test_latent = pd.DataFrame(index=X_test.index)
     for gid, (scaler, ae, _) in encoders.items():
-        feats   = feature_mappings[gid].columns.tolist()
-        enc_dim = ae.coefs_[1].shape[0]
-        Xs = scaler.transform(X_test[feats].to_numpy())
-        Z  = Xs.dot(ae.coefs_[0]) + ae.intercepts_[0]
-        if ae.activation == 'relu':
+        feats = feature_mappings[gid].columns.tolist()
+        Xs = scaler.transform(X_test[feats].values)
+        Z = Xs @ ae.coefs_[0] + ae.intercepts_[0]
+        act = ae.activation
+        if act == 'relu':
             codes = np.maximum(0, Z)
-        elif ae.activation == 'identity':
+        elif act == 'identity':
             codes = Z
-        elif ae.activation == 'logistic':
+        elif act == 'logistic':
             codes = 1 / (1 + np.exp(-Z))
-        elif ae.activation == 'tanh':
+        elif act == 'tanh':
             codes = np.tanh(Z)
         else:
-            raise ValueError(f"Unsupported activation: {ae.activation}")
-
-        if enc_dim == 1:
+            raise ValueError(f"Unsupported activation: {act}")
+        if ae.coefs_[1].shape[0] == 1:
             col = f'group_{gid}'
             X_test_latent[col] = codes.ravel()
             latent_cols.append(col)
         else:
-            for d in range(enc_dim):
+            for d in range(codes.shape[1]):
                 col = f'group_{gid}_dim{d}'
                 X_test_latent[col] = codes[:, d]
                 latent_cols.append(col)
+    return X_test_latent, latent_cols
 
-    # now run SHAP and decompose per‐class
+
+def compute_shap_range_stats(shap_vals, feature_names, lower_pct=5, upper_pct=95,  plot_box=False, label=""):
+    """ Compute robust range stats for each feature, excluding outliers. """
+    if shap_vals.ndim != 2:
+        raise ValueError(f"Expected 2D SHAP array, got {shap_vals.shape}")
+
+    lower_bounds = np.percentile(shap_vals, lower_pct, axis=0)
+    upper_bounds = np.percentile(shap_vals, upper_pct, axis=0)
+    feature_ranges = upper_bounds - lower_bounds
+
+    stats = {
+        'max': np.max(feature_ranges),
+        'min': np.min(feature_ranges),
+        'mean': np.mean(feature_ranges),
+        'std': np.std(feature_ranges)
+    }
+
+    print(f"SHAP value range stats ({lower_pct}-{upper_pct} percentile):")
+    print(f"Max range: {stats['max']:.4f}, Min range: {stats['min']:.4f}, "
+          f"Mean range: {stats['mean']:.4f}, Std: {stats['std']:.4f}")
+
+    ranges_df = pd.DataFrame({
+        'Feature': feature_names,
+        f'Range_{lower_pct}-{upper_pct}pct': feature_ranges
+    }).sort_values(by=f'Range_{lower_pct}-{upper_pct}pct', ascending=False)
+
+    print(ranges_df.head(10))
+
+    
+    if plot_box:
+        plt.figure(figsize=(6, 4))
+        sns.boxplot(x=feature_ranges, color='skyblue')
+        sns.stripplot(x=feature_ranges, color='black', alpha=0.3, jitter=True)
+        plt.title(f"SHAP Range Boxplot {label}")
+        plt.xlabel(f"Feature SHAP Range ({lower_pct}-{upper_pct} pctile)")
+        plt.tight_layout()
+        plt.show()
+
+    return stats
+
+
+def evaluate_shap_features(
+    X_train, X_test, trained_models, encoders, feature_mappings,
+    max_display=10, mode="each_label", z_scores=None
+):
+    """Robust SHAP + range stats, matching background dims correctly."""
+    shap_results = {}
+
+    # RAW FEATURE CASE
+    if not encoders:
+        for name, model in trained_models.items():
+            print(f"\nSHAP (raw) → {name}")
+            bg = shap.kmeans(X_train, min(200, X_train.shape[0]))
+            # Inside RAW FEATURE CASE in evaluate_shap_features:
+            if isinstance(model, Pipeline):
+                scaler = model.named_steps['scaler']
+                estimator = model.named_steps['model']
+                cols = X_train.columns
+
+                def model_predict(X):
+                    if isinstance(X, np.ndarray):
+                        X = pd.DataFrame(X, columns=cols)
+                    X_scaled = scaler.transform(X)
+                    return estimator.predict_proba(X_scaled)
+
+                explainer = shap.KernelExplainer(model_predict, bg)
+            else:
+                explainer = shap.KernelExplainer(model.predict_proba, bg)
+
+            shap_out = explainer(X_test)
+            vals = shap_out.values if hasattr(shap_out, "values") else shap_out
+
+            if vals.ndim == 3 and mode == "each_label":
+                for c in range(vals.shape[2]):
+                    class_vals = vals[:, :, c]
+                    compute_shap_range_stats(class_vals, X_test.columns.tolist())
+                    shap.summary_plot(
+                        class_vals, X_test, feature_names=X_test.columns,
+                        plot_type="dot", max_display=max_display, show=False
+                    )
+                    plt.title(f"{name} – SHAP (raw) class {c}")
+                    plt.tight_layout()
+                    plt.show()
+            elif vals.ndim == 3 and mode == "aggregated":
+                agg = (np.tensordot(vals, z_scores, axes=([2], [0]))
+                       if z_scores is not None else np.sum(np.abs(vals), axis=2))
+                compute_shap_range_stats(agg, X_test.columns.tolist(), plot_box=True, label=f"{name} RAW AGG")
+                shap.summary_plot(
+                    agg, X_test, feature_names=X_test.columns,
+                    plot_type="dot", max_display=max_display, show=False
+                )
+                plt.title(f"{name} – SHAP (raw aggregated)")
+                plt.tight_layout()
+                plt.show()
+            else:
+                compute_shap_range_stats(vals, X_test.columns.tolist())
+                shap.summary_plot(
+                    vals, X_test, feature_names=X_test.columns,
+                    plot_type="dot", max_display=max_display, show=False
+                )
+                plt.title(f"{name} – SHAP (raw)")
+                plt.tight_layout()
+                plt.show()
+            shap_results[name] = {"raw": vals}
+        return shap_results
+    
+    # GROUPED LATENT FEATURE CASE
+    X_train_latent, _ = prepare_latent(X_train, encoders, feature_mappings)
+    X_test_latent, latent_cols = prepare_latent(X_test, encoders, feature_mappings)
+
     for name, model in trained_models.items():
-        print(f"\nSHAP → individual features: {name}")
-
-        # pick explainer
+        print(f"\nSHAP (grouped) → {name}")
         if isinstance(model, (LogisticRegression, SVC, MLPClassifier)):
-            bg_size = min(50, X_train.shape[0])
-            bg = shap.kmeans(X_train, bg_size)
+            bg = shap.kmeans(X_train_latent, min(50, X_train_latent.shape[0]))
             explainer = shap.KernelExplainer(model.predict_proba, bg)
         else:
-            explainer = get_shap_explainer(model, X_train)
+            explainer = get_shap_explainer(model, X_train_latent)
 
         shap_out = explainer(X_test_latent)
-        raw = shap_out.values if hasattr(shap_out, 'values') else shap_out
+        raw = shap_out.values if hasattr(shap_out, "values") else shap_out
 
-        # multiclass?
-        if raw.ndim == 3:
-            n_classes = raw.shape[2]
-            for c in range(n_classes):
-                raw_c = raw[:, :, c]                          # (n_samples, n_latent)
-                shap_feat_df = decompose_shap_to_features(
-                    raw_c, latent_cols, feature_mappings
-                )
-                # summary plot on original features for class c
+        if raw.ndim == 3 and mode == "each_label":
+            for c in range(raw.shape[2]):
+                raw_c = raw[:, :, c]
+                # Decompose latent SHAP to feature SHAP
+                shap_feat_df = decompose_shap_to_features(raw_c, latent_cols, feature_mappings)
+                # Compute stats on the decomposed features
+                compute_shap_range_stats(shap_feat_df.values, shap_feat_df.columns.tolist())
                 shap.summary_plot(
                     shap_feat_df.values,
                     X_test[shap_feat_df.columns],
                     plot_type="dot",
                     max_display=max_display,
-                    color_bar=True,
                     show=False
                 )
-                plt.title(f"{name} – SHAP decomposed for class {c}")
+                plt.title(f"{name} – SHAP grouped class {c}")
                 plt.tight_layout()
                 plt.show()
 
-        else:
-            # binary or single‐output
-            shap_feat_df = decompose_shap_to_features(
-                raw, latent_cols, feature_mappings
-            )
+        elif raw.ndim == 3 and mode == "aggregated":
+            agg = (np.tensordot(raw, z_scores, axes=([2], [0]))
+                if z_scores is not None else np.sum(np.abs(raw), axis=2))
+            shap_feat_df = decompose_shap_to_features(agg, latent_cols, feature_mappings)
+            compute_shap_range_stats(shap_feat_df.values, shap_feat_df.columns.tolist(), plot_box=True, label=f"{name} GROUPED AGG")
             shap.summary_plot(
                 shap_feat_df.values,
                 X_test[shap_feat_df.columns],
                 plot_type="dot",
                 max_display=max_display,
-                color_bar=True,
                 show=False
             )
-            plt.title(f"{name} – SHAP decomposed")
+            plt.title(f"{name} – SHAP grouped aggregated")
             plt.tight_layout()
             plt.show()
 
-def compute_z_score(weights, mean, sd):
-    return np.array([(w - mean)/sd for w in weights])
+        else:
+            shap_feat_df = decompose_shap_to_features(raw, latent_cols, feature_mappings)
+            compute_shap_range_stats(shap_feat_df.values, shap_feat_df.columns.tolist())
+            shap.summary_plot(
+                shap_feat_df.values,
+                X_test[shap_feat_df.columns],
+                plot_type="dot",
+                max_display=max_display,
+                show=False
+            )
+            plt.title(f"{name} – SHAP grouped")
+            plt.tight_layout()
+            plt.show()
+
+        shap_results[name] = {"raw": raw, "decomposed": shap_feat_df}
+
+    return shap_results
