@@ -15,8 +15,6 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import mean_squared_error
 from math import comb
 
-def group_similar(data: pd.DataFrame):
-    raise NotImplementedError
 
 def dissimilarity_matrix(data: pd.DataFrame):
     features = data.columns[:-1]
@@ -320,6 +318,7 @@ def evaluate_k_range(data: pd.DataFrame, method_name: str, k_range=range(2, 11))
         results.append({'k': k, 'avg_diversity': avg_div, 'min_dispersion': min_disp})
 
     return pd.DataFrame(results)
+
 
 def plot_k_selection(results: pd.DataFrame, method_name: str):
     fig, ax1 = plt.subplots(figsize=(10, 6))

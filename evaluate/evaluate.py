@@ -1,45 +1,37 @@
 import numpy as np
 import pandas as pd
-from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, precision_score, confusion_matrix
-from train.models import get_models
+from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, precision_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.base import clone
 
-def evaluate_metrics(X_train, y_train, X_test, y_test, task_name="Unknown"):
+def evaluate_metrics(X_train, y_train, X_test, y_test, model, task_name="Unknown"):
     """
-    Trains and evaluates each model on classification metrics.
-
-    Returns:
-    - results: pd.DataFrame with Accuracy, F1-score, and ROC AUC per model
+    Trains and evaluates the given model on classification metrics.
     """
-    results = []
-    trained_models = {}
-    models = get_models()
+    print(f"Training: {model.__class__.__name__} on {task_name}")
 
-    for name, model in models.items():
-        print(f"Training: {name} on {task_name}")
-        model.fit(X_train, y_train)
-        trained_models[name] = model
-        y_pred = model.predict(X_test)
-        y_proba = model.predict_proba(X_test)[:, 1] if hasattr(model, "predict_proba") else y_pred
+    model_clone = clone(model)
+    model_clone.fit(X_train, y_train)
+    y_pred = model_clone.predict(X_test)
+    y_proba = model_clone.predict_proba(X_test)[:, 1] if hasattr(model_clone, "predict_proba") else y_pred
 
-        acc = accuracy_score(y_test, y_pred)
-        f1 = f1_score(y_test, y_pred, average='macro')
-        prec = precision_score(y_test, y_pred, average='macro')
-        try:
-            auc = roc_auc_score(y_test, y_proba)
-        except:
-            auc = None
+    acc = accuracy_score(y_test, y_pred)
+    f1 = f1_score(y_test, y_pred, average='macro')
+    prec = precision_score(y_test, y_pred, average='macro')
+    try:
+        auc = roc_auc_score(y_test, y_proba)
+    except:
+        auc = None
 
-        results.append({
-            "Model": name,
-            "Accuracy": acc,
-            "Precision": prec,
-            "F1-score": f1,
-            "ROC AUC": auc
-        })
+    results = pd.DataFrame([{
+        "Model": model.__class__.__name__,
+        "Accuracy": acc,
+        "Precision": prec,
+        "F1-score": f1,
+        "ROC AUC": auc
+    }])
 
-    return pd.DataFrame(results), trained_models
+    return results, model_clone
 
 
 def run_kfold_cv(X, y, model, k=5, repeats=10, seed=42):
@@ -63,8 +55,7 @@ def run_kfold_cv(X, y, model, k=5, repeats=10, seed=42):
                 aucs.append(roc_auc_score(y_test, y_proba))
             except:
                 aucs.append(None)
-            # fairness = fairness_metrics(y_test, y_pred, sensitive=X_test["sex"], privileged_value=1)
-            # print("fairness:", fairness)
+
     return {
         "accuracy": np.array(accs),
         "f1_score": np.array(f1s),

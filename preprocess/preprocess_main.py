@@ -11,46 +11,6 @@ from preprocess.encode import encode_datasets
 from preprocess.handle_missing_values import deal_data_with_na
 from preprocess.normalise import normalise
 
-# === High-level Preprocessing ===
-
-def preprocess_all(model: str) -> Tuple[List[pd.DataFrame], ...]:
-    """
-    Preprocesses all selected datasets according to model-specific requirements.
-
-    Parameters:
-    - model (str): Name of the model which determines the preprocessing steps.
-
-    Returns:
-    - Tuple of [train_data, test_data] for each dataset.
-    """
-    # Set preprocessing needs based on the model type
-    if model in ["LinearRegression", "LogisticRegression", "SVM", "MLP"]:
-        needs_encoding, needs_normalisation, needs_imputation = True, True, True
-    elif model == "RandomForest":
-        needs_encoding, needs_normalisation, needs_imputation = True, False, True
-    elif model == "XGBoost":
-        needs_encoding, needs_normalisation, needs_imputation = True, True, True
-
-    # Apply preprocessing for each dataset
-    breast_train, breast_test = preprocess("Breast_cancer", needs_normalisation, needs_encoding, needs_imputation)
-    # heart_train, heart_test = preprocess("Heart_disease", needs_normalisation, needs_encoding, needs_imputation)
-    # lung_train, lung_test = preprocess("Lung_cancer", needs_normalisation, needs_encoding, needs_imputation)
-    # diabetes_train, diabetes_test = preprocess("Diabetes", needs_normalisation, needs_encoding, needs_imputation)
-    # obesity_train, obesity_test = preprocess("Obesity", needs_normalisation, needs_encoding, needs_imputation)
-    alzheimer_train, alzheimer_test = preprocess("Alzheimer", needs_normalisation, needs_encoding, needs_imputation)
-    # crime_train, crime_test = preprocess("Crime", needs_normalisation, needs_encoding, needs_imputation)
-    return (
-        # [breast_train, breast_test], 
-        # [heart_train, heart_test], 
-        # [lung_train, lung_test], 
-        # [diabetes_train, diabetes_test], 
-        # [obesity_train, obesity_test], 
-        [alzheimer_train, alzheimer_test],
-        # [crime_train, crime_test]
-    )
-
-
-# === Core Preprocessing Logic ===
 
 def preprocess(
     name: str, 
@@ -87,8 +47,6 @@ def preprocess(
     data_raw = fetch_ucirepo(id=name_to_id.get(name))
     X, y = data_raw.data.features, data_raw.data.targets
 
-    print(y)
-
     if log:
         print(X.head()) 
         print(f"({name}) Variables:")
@@ -98,10 +56,11 @@ def preprocess(
     data_raw = pd.concat([X, y], axis=1)
 
     numeric_cols = data_raw.select_dtypes(include=[np.number]).columns.tolist()
-    str_cols = data_raw.select_dtypes(include=[object]).columns.tolist()
-    
-    print(len(numeric_cols))
-    print(len(str_cols))
+    if name == "Heart_disease":
+        categorical = ["sex", "cp", "fbs", "restecg", "exang",  "slope" , "ca", "thal", "num"]
+        for category in categorical:
+            numeric_cols.remove(category)
+
     filled_data = data_raw
     if needs_encoding:
         # Special handling for Diabetes dataset (due to more missing values)
