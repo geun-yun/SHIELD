@@ -26,6 +26,18 @@ def _compute_group_rates(y_true, y_pred):
     }
 
 
+def disparate_impact(y_pred, sensitive, privileged_value):
+    privileged_mask = (sensitive == privileged_value)
+    unprivileged_mask = ~privileged_mask
+
+    p_priv = np.mean(y_pred[privileged_mask] == 1)
+    p_unpriv = np.mean(y_pred[unprivileged_mask] == 1)
+
+    if p_priv == 0:
+        return np.nan
+    return p_unpriv / p_priv
+
+
 def equal_opportunity(rates_priv, rates_unpriv):
     return abs(rates_priv["TPR"] - rates_unpriv["TPR"])
 
@@ -65,7 +77,7 @@ def explanation_bias(shap_values, sensitive, privileged_value, feature_names):
 
 
 def plot_instance_level_quadrant(y_pred_proba, shap_values, sensitive, privileged_value,
-                                 protected_idx, alpha=0.05, class_idx=1):
+                                 protected_idx, dataset_name, alpha=0.05, class_idx=1):
     p_pos = y_pred_proba[:, class_idx]
 
     if shap_values.ndim == 3:
@@ -93,6 +105,10 @@ def plot_instance_level_quadrant(y_pred_proba, shap_values, sensitive, privilege
     if len(x_vals) != len(y_vals):
         raise ValueError(f"x and y must be same size! Got x: {x_vals.shape}, y: {y_vals.shape}")
 
+    distances = np.sqrt(x_vals**2 + y_vals**2)
+    avg_distance = np.mean(distances)
+    print(f"Average distance from origin (bias magnitude): {avg_distance:.4f}")
+
     plt.figure(figsize=(8, 8))
 
     # Use scatter with c= for color
@@ -114,7 +130,14 @@ def plot_instance_level_quadrant(y_pred_proba, shap_values, sensitive, privilege
 
     plt.xlabel(f"SHAP for protected attribute")
     plt.ylabel(f"Prediction minus Base Rate (R - mu_t)")
-    plt.title(f"Instance-Level Bias Quadrant")
+    plt.title(f"Instance-Level Bias Quadrant for {dataset_name}")
+    plt.text(
+        0.05, 0.95, 
+        f"Avg Distance: {avg_distance:.4f}",
+        ha='left', va='top',
+        transform=plt.gca().transAxes,
+        fontsize=10, bbox=dict(facecolor='white', alpha=0.5)
+    )
     plt.show()
 
 
@@ -143,7 +166,7 @@ def fairness_metrics(y_true, y_pred, sensitive, privileged_value,
                      shap_values=None, feature_names=None,
                      y_pred_proba=None, protected_attr=None,
                      alpha=0.05,
-                     X_empirical=None, X_removal=None):
+                     X_empirical=None, X_removal=None, dataset_name=None):
     results = {}
 
     privileged_mask = (sensitive == privileged_value)
@@ -151,8 +174,9 @@ def fairness_metrics(y_true, y_pred, sensitive, privileged_value,
 
     rates_priv = _compute_group_rates(y_true[privileged_mask], y_pred[privileged_mask])
     rates_unpriv = _compute_group_rates(y_true[unprivileged_mask], y_pred[unprivileged_mask])
-
-    results["Equal Opportunity (TPR diff)"] = equal_opportunity(rates_priv, rates_unpriv)
+    
+    results["Disparate Impact"] = disparate_impact(y_pred, sensitive, privileged_value)
+    results["Equal Opportunity"] = equal_opportunity(rates_priv, rates_unpriv)
     results["Equalized Odds"] = equalized_odds(rates_priv, rates_unpriv)
     results["Predictive Parity"] = predictive_parity(rates_priv, rates_unpriv)
 
@@ -165,7 +189,7 @@ def fairness_metrics(y_true, y_pred, sensitive, privileged_value,
             protected_idx = feature_names.index(protected_attr)
             plot_instance_level_quadrant(
                 y_pred_proba, shap_values, sensitive, privileged_value,
-                protected_idx, alpha=alpha
+                protected_idx, alpha=alpha, dataset_name=dataset_name
             )
 
     # TODO: add error decomposition if provided

@@ -132,16 +132,16 @@ def encode_Alzheimer(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
 
 
 def encode_Diabetes(data: pd.DataFrame) -> Tuple[pd.DataFrame, List[str]]:
-    nominal_features = ["race", "gender", "diag_1", "diag_2", "diag_3", 
-                        "max_glu_serum", "A1Cresult", "metformin", "repaglinide", 
-                        "nateglinide", "chlorpropamide", "glimepiride", "acetohexamide", 
-                        "glipizide", "glyburide", "tolbutamide", "pioglitazone", 
-                        "rosiglitazone", "acarbose", "miglitol", "troglitazone", 
-                        "tolazamide", "examide", "citoglipton", "insulin", 
-                        "glyburide-metformin", "glipizide-metformin", 
-                        "glimepiride-pioglitazone", "metformin-rosiglitazone", 
-                        "metformin-pioglitazone", "change", "diabetesMed", 
-                        "readmitted!", "payer_code", "medical_specialty"]
+    nominal_features = ["race!", "gender!", "diag_1!", "diag_2!", "diag_3!", 
+                        "max_glu_serum!", "A1Cresult!", "metformin!", "repaglinide!", 
+                        "nateglinide!", "chlorpropamide!", "glimepiride!", "acetohexamide!", 
+                        "glipizide!", "glyburide!", "tolbutamide!", "pioglitazone!", 
+                        "rosiglitazone!", "acarbose!", "miglitol!", "troglitazone!", 
+                        "tolazamide!", "examide!", "citoglipton!", "insulin!", 
+                        "glyburide-metformin!", "glipizide-metformin!", 
+                        "glimepiride-pioglitazone!", "metformin-rosiglitazone!", 
+                        "metformin-pioglitazone!", "change!", "diabetesMed!", 
+                        "readmitted!", "payer_code!", "medical_specialty!"]
 
     age_order = [
         "[0-10)",

@@ -15,7 +15,7 @@ from evaluate.fairness import fairness_metrics
 def get_sensitive_attr(dataset_name: str) -> str | None:
     mapping = {
         "Obesity": "Gender_Male",
-        "Diabetes": "race_Caucasian",
+        "Diabetes": "race",
         "Heart_disease": "sex",
         "Breast_cancer": None,
         "Alzheimer": None
@@ -39,15 +39,21 @@ def run_pipeline(
     print(f"SHAP Mode: {shap_mode}")
 
     models = get_models()
-    if model_name not in models:
+    
+    if model_name in ["LogisticRegression", "SVM", "MLP"]:
+        needs_normalisation, needs_encoding, needs_imputation = True, True, True
+    elif model_name == "RandomForest":
+        needs_normalisation, needs_encoding, needs_imputation = False, True, True
+    elif model_name == "XGBoost":
+        needs_normalisation, needs_encoding, needs_imputation = False, False, False
+    elif model_name not in models:
         raise ValueError(f"Model '{model_name}' not found. Check get_models().")
-    base_model = models[model_name]
 
     train_data, test_data = preprocess(
         name=dataset_name,
-        needs_normalisation=True,
-        needs_encoding=True,
-        needs_imputation=True
+        needs_normalisation=needs_normalisation,
+        needs_encoding=needs_encoding,
+        needs_imputation=needs_imputation
     )
 
     sensitive_attr = get_sensitive_attr(dataset_name)
@@ -113,11 +119,12 @@ def run_pipeline(
                 y_true=y_test,
                 y_pred=y_test_pred,
                 sensitive=sensitive_test,
-                privileged_value=1,
+                privileged_value=2 if dataset_name=="Diabetes" else 1,
                 shap_values=shap_ungrouped["Ungrouped"]["raw"],
                 y_pred_proba=y_test_proba,
                 protected_attr=sensitive_attr,
-                feature_names=X_test.columns.tolist()
+                feature_names=X_test.columns.tolist(),
+                dataset_name=dataset_name
             )
             print("Fairness (Ungrouped):", fair_ungrouped)
 
@@ -175,11 +182,12 @@ def run_pipeline(
                 y_true=y_test,
                 y_pred=y_test_pred,
                 sensitive=sensitive_test,
-                privileged_value=1,
+                privileged_value=2 if dataset_name=="Diabetes" else 1,
                 shap_values=shap_grouped["Grouped"]["raw"],
                 y_pred_proba=y_test_proba,
                 protected_attr=sensitive_attr,
-                feature_names=X_test.columns.tolist()
+                feature_names=X_test.columns.tolist(),
+                dataset_name=dataset_name
             )
             print("Fairness (Grouped):", fair_grouped)
 
