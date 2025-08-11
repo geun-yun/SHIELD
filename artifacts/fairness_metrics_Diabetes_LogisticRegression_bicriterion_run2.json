@@ -1,0 +1,8 @@
+{
+    "Disparate Impact": 1.2518538362865728,
+    "Equal Opportunity": 0.0004996790099460746,
+    "Equalized Odds": 0.006991778888792544,
+    "Predictive Parity": 0.03911970587944402,
+    "N-Sigma (ErrorRate)": 0.0786637302127688,
+    "Average distance from origin": 0.09901392364313388
+}

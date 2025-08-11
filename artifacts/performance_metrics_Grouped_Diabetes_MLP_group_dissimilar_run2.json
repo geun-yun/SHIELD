@@ -1,0 +1,9 @@
+[
+    {
+        "Model": "Pipeline",
+        "Accuracy": 0.5625214956026139,
+        "Precision": 0.5106529628277721,
+        "F1-score": 0.35579130375610885,
+        "ROC AUC": null
+    }
+]

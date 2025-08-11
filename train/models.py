@@ -16,7 +16,7 @@ def get_models(random_state=42):
     return {
         "LogisticRegression": LogisticRegression(max_iter=2000, solver='lbfgs', random_state=random_state),
         "SVM": SVC(kernel='rbf', probability=True, random_state=random_state),
-        "MLP": MLPClassifier(hidden_layer_sizes=(100,), max_iter=300, random_state=random_state),
+        "MLP": MLPClassifier(hidden_layer_sizes=(100,), max_iter=1000, early_stopping=True, random_state=random_state),
         "RandomForest": RandomForestClassifier(n_estimators=100, random_state=random_state),
         "XGBoost": XGBClassifier(eval_metric='logloss', random_state=random_state)
     }
@@ -27,12 +27,12 @@ def get_bayes_spaces():
       "LogisticRegression": {
         "model__C": Real(1e-2, 1e2, prior="log-uniform")
       },
-      "SVC": {
+      "SVM": {
         "model__C":     Real(1e-2, 1e2, prior="log-uniform"),
         "model__gamma": Real(1e-3, 1.0, prior="log-uniform")
       },
       "MLP": {
-        "model__hidden_layer_sizes": Categorical([(50,), (100,), (200,)]),
+        "model__hidden_layer_sizes": Categorical([50, 100, 200]),
         "model__alpha":              Real(1e-4, 1e-1, prior="log-uniform"),
         "model__learning_rate_init": Real(1e-3, 3e-1, prior="log-uniform")
       },

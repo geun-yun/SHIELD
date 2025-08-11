@@ -1,8 +1,12 @@
+import os
 import numpy as np
 from sklearn.metrics import confusion_matrix, roc_auc_score
 from sklearn.neighbors import KernelDensity, KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from utils import save_plot, save_metrics
+
 
 def _compute_group_rates(y_true, y_pred):
     labels = np.unique(np.concatenate([y_true, y_pred]))
@@ -76,8 +80,16 @@ def explanation_bias(shap_values, sensitive, privileged_value, feature_names):
     return bias_per_feature
 
 
+def _save_plot_with_runid(fig, path: str, run_id=None):
+    """Embed run_id into filename if given, then delegate to save_plot."""
+    if run_id is not None:
+        base, ext = os.path.splitext(path)
+        path = f"{base}_run{run_id}{ext}"
+    save_plot(fig, path)
+
+
 def plot_instance_level_quadrant(y_pred_proba, shap_values, sensitive, privileged_value,
-                                 protected_idx, dataset_name, alpha=0.05, class_idx=1):
+                                 protected_idx, dataset_name, alpha=0.05, class_idx=1, run_id=None, config_name=None):
     p_pos = y_pred_proba[:, class_idx]
 
     if shap_values.ndim == 3:
@@ -111,15 +123,12 @@ def plot_instance_level_quadrant(y_pred_proba, shap_values, sensitive, privilege
 
     plt.figure(figsize=(8, 8))
 
-    # Use scatter with c= for color
     colors = np.where(sensitive_masked == privileged_value, 'blue', 'red')
-    plt.scatter(x_vals, y_vals, c=colors, alpha=0.5, label=None)
+    plt.scatter(x_vals, y_vals, c=colors, alpha=0.5)
 
     plt.axhline(0, color='grey', linestyle='--')
     plt.axvline(0, color='grey', linestyle='--')
 
-    # Add legend
-    from matplotlib.lines import Line2D
     legend_elements = [
         Line2D([0], [0], marker='o', color='w', label='Privileged',
                markerfacecolor='blue', markersize=8),
@@ -128,17 +137,23 @@ def plot_instance_level_quadrant(y_pred_proba, shap_values, sensitive, privilege
     ]
     plt.legend(handles=legend_elements, title='Sensitive Attribute')
 
-    plt.xlabel(f"SHAP for protected attribute")
-    plt.ylabel(f"Prediction minus Base Rate (R - mu_t)")
+    plt.xlabel("SHAP for protected attribute")
+    plt.ylabel("Prediction minus Base Rate (R - μ_t)")
     plt.title(f"Instance-Level Bias Quadrant for {dataset_name}")
     plt.text(
-        0.05, 0.95, 
+        0.05, 0.95,
         f"Avg Distance: {avg_distance:.4f}",
         ha='left', va='top',
         transform=plt.gca().transAxes,
         fontsize=10, bbox=dict(facecolor='white', alpha=0.5)
     )
-    plt.show()
+
+    fname = f"bias_quadrant_{config_name}.png"
+    fig = plt.gcf()
+    _save_plot_with_runid(fig, fname, run_id=run_id)
+    plt.close(fig)
+
+    return avg_distance
 
 
 def estimate_observation_bias(X_empirical, X_removal):
@@ -166,7 +181,7 @@ def fairness_metrics(y_true, y_pred, sensitive, privileged_value,
                      shap_values=None, feature_names=None,
                      y_pred_proba=None, protected_attr=None,
                      alpha=0.05,
-                     X_empirical=None, X_removal=None, dataset_name=None):
+                     X_empirical=None, X_removal=None, dataset_name=None, run_id=None, config_name=None):
     results = {}
 
     privileged_mask = (sensitive == privileged_value)
@@ -174,7 +189,7 @@ def fairness_metrics(y_true, y_pred, sensitive, privileged_value,
 
     rates_priv = _compute_group_rates(y_true[privileged_mask], y_pred[privileged_mask])
     rates_unpriv = _compute_group_rates(y_true[unprivileged_mask], y_pred[unprivileged_mask])
-    
+
     results["Disparate Impact"] = disparate_impact(y_pred, sensitive, privileged_value)
     results["Equal Opportunity"] = equal_opportunity(rates_priv, rates_unpriv)
     results["Equalized Odds"] = equalized_odds(rates_priv, rates_unpriv)
@@ -187,14 +202,18 @@ def fairness_metrics(y_true, y_pred, sensitive, privileged_value,
     if shap_values is not None and y_pred_proba is not None and protected_attr is not None:
         if protected_attr in feature_names:
             protected_idx = feature_names.index(protected_attr)
-            plot_instance_level_quadrant(
+            avg_dist = plot_instance_level_quadrant(
                 y_pred_proba, shap_values, sensitive, privileged_value,
-                protected_idx, alpha=alpha, dataset_name=dataset_name
+                protected_idx, dataset_name, alpha=alpha, class_idx=1, run_id=run_id, config_name=config_name
             )
+            results["Average distance from origin"] = avg_dist
 
-    # TODO: add error decomposition if provided
     if X_empirical is not None and X_removal is not None:
         results["Observation Bias (TV)"] = estimate_observation_bias(X_empirical, X_removal)
         results["Structural Bias (kNN AUC)"] = estimate_structural_bias(X_empirical, X_removal)
+
+    if dataset_name is not None:
+        fname = f"fairness_metrics_{config_name}.json"
+        save_metrics(results, fname, run_id=run_id)
 
     return results

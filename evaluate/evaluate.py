@@ -3,8 +3,9 @@ import pandas as pd
 from sklearn.metrics import accuracy_score, f1_score, roc_auc_score, precision_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.base import clone
+from utils import save_metrics
 
-def evaluate_metrics(X_train, y_train, X_test, y_test, model, task_name="Unknown"):
+def evaluate_metrics(X_train, y_train, X_test, y_test, model, task_name="Unknown", run_id=None, config_name=None):
     """
     Trains and evaluates the given model on classification metrics.
     """
@@ -30,6 +31,9 @@ def evaluate_metrics(X_train, y_train, X_test, y_test, model, task_name="Unknown
         "F1-score": f1,
         "ROC AUC": auc
     }])
+
+    fname = f"performance_metrics_{task_name}_{config_name}.json"
+    save_metrics(results.to_dict(orient="records"), fname, run_id=run_id)
 
     return results, model_clone
 

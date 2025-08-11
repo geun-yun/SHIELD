@@ -1,0 +1,23 @@
+{
+    "mean": {
+        "accuracy": 0.6557377049180327,
+        "f1_score": 0.2587596899224806,
+        "Disparate Impact": 1.3461538461538463,
+        "Equal Opportunity": 0.299999790000117,
+        "Equalized Odds": 0.299999790000117,
+        "Predictive Parity": 0.0,
+        "N-Sigma (ErrorRate)": 0.3078070219112933,
+        "Average distance from origin": 0.07440961582013764
+    },
+    "std": {
+        "accuracy": 0.0,
+        "f1_score": 0.0,
+        "Disparate Impact": 0.0,
+        "Equal Opportunity": 0.0,
+        "Equalized Odds": 0.0,
+        "Predictive Parity": 0.0,
+        "N-Sigma (ErrorRate)": 0.0,
+        "Average distance from origin": 8.184381923261366e-06
+    },
+    "num_runs": 2
+}

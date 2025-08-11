@@ -14,6 +14,44 @@ from scipy.stats import skew, kurtosis
 from sklearn.cluster import KMeans
 from sklearn.metrics import mean_squared_error
 from math import comb
+import random
+from utils import save_plot
+
+def random_grouping(data: pd.DataFrame, k: int = 5, seed: int = 42):
+    """
+    Randomly partitions features into k groups, ignoring dissimilarities.
+    This serves as a baseline method for comparison.
+
+    Parameters:
+    - data: pd.DataFrame, input data with features and the target as the last column
+    - k: int, number of groups
+    - seed: int, random seed for reproducibility
+
+    Returns:
+    - groups: dict mapping group index to list of feature names
+    """
+    features = data.columns[:-1].tolist()
+    random.seed(seed)
+    shuffled = features.copy()
+    random.shuffle(shuffled)
+
+    groups = {i: [] for i in range(k)}
+    for i, feat in enumerate(shuffled):
+        group_id = i % k
+        groups[group_id].append(feat)
+
+    print("\nRandom Grouping - Feature Groups:")
+    for group_id, feats in groups.items():
+        print(f" Group {group_id}: {feats}")
+
+    diss = dissimilarity_matrix(data)
+    evaluate_grouping(groups, features, diss, method_name="random_grouping")
+
+    # results = evaluate_k_range(data, method_name="random_grouping", k_range=range(2, 11))
+    # fig = plot_k_selection(results, method_name="random_grouping")
+    # save_plot(fig, f"diversity_dispersion_random_grouping.png")
+
+    return groups
 
 
 def dissimilarity_matrix(data: pd.DataFrame):
@@ -52,7 +90,7 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
     target = data.columns[-1]
     n = len(features)
 
-    # Step 1: Compute pairwise normalized CMI as similarity, then invert to get dissimilarity
+    # Compute pairwise normalized CMI as similarity, then invert to get dissimilarity
     dissimilarity = dissimilarity_matrix(data)
     # print(dissimilarity)
     sns.heatmap(dissimilarity, xticklabels=features, yticklabels=features)
@@ -85,7 +123,7 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
     # plt.tight_layout()
     # plt.show()
     ####################################################
-    # Step 2: Greedy grouping to maximize diversity
+    # Greedy grouping to maximize diversity
     groups = {i: [] for i in range(num_groups)}
     assigned = set()
     remaining = set(range(n))
@@ -122,6 +160,11 @@ def group_dissimilar(data: pd.DataFrame, num_groups: int = 5):
         print(f" Group {group_id}: {feature_list}")
     
     evaluate_grouping(groups, features.tolist(), dissimilarity, method_name="group_dissimilar")
+
+    # results = evaluate_k_range(data, method_name="group_dissimilar", k_range=range(2, 11))
+    # fig = plot_k_selection(results, method_name="group_dissimilar")
+    # save_plot(fig, f"diversity_dispersion_group_dissimilar.png")
+
     return groups
 
 
@@ -198,20 +241,33 @@ def score(groups, dist_matrix, x1, x2):
     return x1 * f1 + x2 * f2
 
 
-def evaluate_grouping(groups: dict, feature_list: list, dist_matrix: np.ndarray, method_name=""):
+def evaluate_grouping(groups: dict, feature_list: list, dist_matrix: np.ndarray,
+                      method_name="", normalize=False):
     group_indices = [[feature_list.index(f) for f in group] for group in groups.values()]
-    
+
     diversity_scores = [diversity(g, dist_matrix) for g in group_indices]
     dispersion_scores = [dispersion(g, dist_matrix) for g in group_indices]
 
-    avg_div = np.nansum(diversity_scores)
+    avg_div = np.nanmean(diversity_scores)
     min_disp = np.nanmin(dispersion_scores)
 
     print(f"\n[{method_name}] Evaluation:")
     print(f" - Average Diversity:  {avg_div:.4f}")
     print(f" - Minimum Dispersion: {min_disp:.4f}")
-    
+
+    if normalize:
+        D_min = np.min(dist_matrix[np.triu_indices_from(dist_matrix, k=1)])
+        D_max = np.max(dist_matrix[np.triu_indices_from(dist_matrix, k=1)])
+        avg_div_norm = (avg_div - D_min) / (D_max - D_min)
+        min_disp_norm = (min_disp - D_min) / (D_max - D_min)
+
+        print(f" - Normalized Diversity:  {avg_div_norm:.4f}")
+        print(f" - Normalized Dispersion: {min_disp_norm:.4f}")
+
+        return avg_div_norm, min_disp_norm
+
     return avg_div, min_disp
+
 
 def bicriterion_anticlustering(data: pd.DataFrame, k: int = 5, restarts: int = 10):
     """
@@ -284,21 +340,15 @@ def bicriterion_anticlustering(data: pd.DataFrame, k: int = 5, restarts: int = 1
         print(f" Group {group_id}: {feats}")
     # Evaluate result
     evaluate_grouping(group_dict, features, dissim, method_name="bicriterion_anticlustering")
+
+    # results = evaluate_k_range(data, method_name="bicriterion", k_range=range(2, 11))
+    # fig = plot_k_selection(results, method_name="bicriterion")
+    # save_plot(fig, f"diversity_dispersion_bicriterion.png")
+
     return group_dict
 
 
 def evaluate_k_range(data: pd.DataFrame, method_name: str, k_range=range(2, 11)):
-    """
-    Evaluate the anticlustering quality over different k values using diversity and dispersion.
-
-    Parameters:
-    - data: pd.DataFrame with features and target
-    - method_name: 'group_dissimilar', 'k_plus', or 'bicriterion'
-    - k_range: range of k values to test
-
-    Returns:
-    - results: pd.DataFrame with columns ['k', 'avg_diversity', 'min_dispersion']
-    """
     results = []
 
     for k in k_range:
@@ -308,16 +358,24 @@ def evaluate_k_range(data: pd.DataFrame, method_name: str, k_range=range(2, 11))
             groups = k_plus_anticlustering(data.copy(), k=k, verbose=False)
         elif method_name == 'bicriterion':
             groups = bicriterion_anticlustering(data.copy(), k=k, restarts=5)
+        elif method_name == 'random':
+            groups = random_grouping(data.copy(), k=k)
         else:
             raise ValueError("Unknown method")
 
         features = data.columns[:-1].tolist()
         diss = dissimilarity_matrix(data)
         avg_div, min_disp = evaluate_grouping(groups, features, diss, method_name=f"{method_name}_k={k}")
-
         results.append({'k': k, 'avg_diversity': avg_div, 'min_dispersion': min_disp})
 
-    return pd.DataFrame(results)
+    results_df = pd.DataFrame(results)
+    
+    fig = plot_k_selection(results_df, method_name=method_name)
+    save_plot(fig, f"artifacts/plots/diversity_dispersion_{method_name}.png")
+
+    
+    return results_df
+
 
 
 def plot_k_selection(results: pd.DataFrame, method_name: str):
@@ -336,7 +394,9 @@ def plot_k_selection(results: pd.DataFrame, method_name: str):
     plt.title(f'Group Evaluation vs k ({method_name})')
     fig.tight_layout()
     plt.grid(True)
-    plt.show()
+    # plt.show()
+    
+    return fig
 
 
 def k_plus_anticlustering(data, k=5, verbose=True):
@@ -387,6 +447,11 @@ def k_plus_anticlustering(data, k=5, verbose=True):
             print(f" Group {group_id}: {feats}")
 
     evaluate_grouping(group_dict, features, dissimilarity, method_name="k_plus_anticlustering")
+
+    # results = evaluate_k_range(data, method_name="k_plus_anticluster", k_range=range(2, 11))
+    # fig = plot_k_selection(results, method_name="k_plus_anticluster")
+    # save_plot(fig, f"diversity_dispersion_k_plus_anticluster.png")
+
     return group_dict
 
 
@@ -425,19 +490,21 @@ def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float
             if best_encoding is None:
                 best_encoding = encoding_dim
 
-            # Refit on full scaled data
+            # Refit on full scaled data with the selected encoding size
             model = MLPRegressor(hidden_layer_sizes=(best_encoding,), activation='relu', max_iter=2000, random_state=42)
             model.fit(X_scaled, X_scaled)
             W0, b0 = model.coefs_[0], model.intercepts_[0]
-            Z      = X_scaled.dot(W0) + b0
-            encoded = np.maximum(0, Z)
+            Z = X_scaled.dot(W0) + b0
+            encoded = np.maximum(0, Z)  # ReLU activation assumed
 
-            # ae.coefs_[1] has shape (best_encoding, len(group_feats))
-            W_dec = model.coefs_[1]
-            if encoding_dim == 1:
+            W_dec = model.coefs_[1]  # shape: (best_encoding, len(group_feats))
+
+            # Name latent dimensions based on actual best_encoding
+            if best_encoding == 1:
                 latent_names = [f'group_{group_id}']
             else:
-                latent_names = [f'group_{group_id}_dim{d}' for d in range(encoding_dim)]
+                latent_names = [f'group_{group_id}_dim{d}' for d in range(best_encoding)]
+
             mapping_df = pd.DataFrame(
                 W_dec,
                 index=latent_names,
@@ -448,26 +515,24 @@ def embed_feature_groups(data: pd.DataFrame, groups: dict, loss_threshold: float
             # Save encoder
             trained_encoders[group_id] = (scaler, model, best_encoding)
 
+            print(f"[Group {group_id}] Selected encoding dim: {best_encoding}")
+
         else:
             scaler, model, best_encoding = encoders[group_id]
             X_scaled = scaler.transform(X)
             W0, b0 = model.coefs_[0], model.intercepts_[0]
-            Z      = X_scaled.dot(W0) + b0
-            encoded = np.maximum(0, Z)
+            Z = X_scaled.dot(W0) + b0
+            encoded = np.maximum(0, Z)  # assuming relu activation
 
         # Validate output shape
         if encoded.shape[0] != X.shape[0]:
             raise ValueError(f"[Group {group_id}] Encoded output has shape {encoded.shape}, expected {X.shape[0]} rows")
 
         # Store embedding
-        if encoded.ndim == 1 or encoded.shape[1] == 1:
+        if encoded.ndim == 1 or (encoded.ndim == 2 and encoded.shape[1] == 1):
             embeddings[f"group_{group_id}"] = encoded.ravel()
         else:
             for d in range(encoded.shape[1]):
                 embeddings[f"group_{group_id}_dim{d}"] = encoded[:, d]
-
-
-        if fit:
-            print(f"[Group {group_id}] Selected encoding dim: {best_encoding}")
 
     return (embeddings, trained_encoders, feature_mappings) if fit else embeddings
