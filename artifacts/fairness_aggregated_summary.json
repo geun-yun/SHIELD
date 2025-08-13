@@ -1,0 +1,164 @@
+{
+  "Disparate Impact": {
+    "Ungrouped": {
+      "Heart Disease": 0.611888111888112,
+      "Obesity": 1.2664371805027193,
+      "Diabetes": 0.9659642384532453
+    },
+    "Random": {
+      "Heart Disease": 0.26849112426035504,
+      "Obesity": 1.177848265405869,
+      "Diabetes": 0.8982834449828814
+    },
+    "Greedy": {
+      "Heart Disease": 1.5985576923076925,
+      "Obesity": 1.111914921285121,
+      "Diabetes": 0.8588377253797752
+    },
+    "K-plus": {
+      "Heart Disease": 1.9335664335664338,
+      "Obesity": 1.1760244681426948,
+      "Diabetes": 1.2053067570991587
+    },
+    "Bicriterion": {
+      "Heart Disease": 0.9237045006275776,
+      "Obesity": 1.2396475409427343,
+      "Diabetes": 0.9616816561853101
+    }
+  },
+  "Equal Opportunity": {
+    "Ungrouped": {
+      "Heart Disease": 0.5196076968954668,
+      "Obesity": 0.029511036848743195,
+      "Diabetes": 0.00527345110246585
+    },
+    "Random": {
+      "Heart Disease": 0.21373620469520022,
+      "Obesity": 0.10281309067796664,
+      "Diabetes": 0.0030847791584494135
+    },
+    "Greedy": {
+      "Heart Disease": 0.31249989062504296,
+      "Obesity": 0.1279770148180889,
+      "Diabetes": 0.0042263884224598815
+    },
+    "K-plus": {
+      "Heart Disease": 0.37272706030314373,
+      "Obesity": 0.2189337689007566,
+      "Diabetes": 0.0022365371491347933
+    },
+    "Bicriterion": {
+      "Heart Disease": 0.2319327170721762,
+      "Obesity": 0.09113595203719588,
+      "Diabetes": 0.0037713596590966724
+    }
+  },
+  "Equalized Odds": {
+    "Ungrouped": {
+      "Heart Disease": 0.5196076968954668,
+      "Obesity": 0.06315116997599925,
+      "Diabetes": 0.012574304255894992
+    },
+    "Random": {
+      "Heart Disease": 0.24065927065675072,
+      "Obesity": 0.11565002419391963,
+      "Diabetes": 0.009796310494863092
+    },
+    "Greedy": {
+      "Heart Disease": 0.28082569033538074,
+      "Obesity": 0.12218121195226106,
+      "Diabetes": 0.025404483686978462
+    },
+    "K-plus": {
+      "Heart Disease": 0.37272706030314373,
+      "Obesity": 0.2207543921387362,
+      "Diabetes": 0.003885104182523918
+    },
+    "Bicriterion": {
+      "Heart Disease": 0.21398421904055617,
+      "Obesity": 0.09922790549164084,
+      "Diabetes": 0.015508623296239277
+    }
+  },
+  "Predictive Parity": {
+    "Ungrouped": {
+      "Heart Disease": 0.6470585980392958,
+      "Obesity": 0.04982039520490558,
+      "Diabetes": 0.023926499933976848
+    },
+    "Random": {
+      "Heart Disease": 0.5109886293828275,
+      "Obesity": 0.13756301907067267,
+      "Diabetes": 0.021026064193272097
+    },
+    "Greedy": {
+      "Heart Disease": 0.8499990300009941,
+      "Obesity": 0.06265570818550506,
+      "Diabetes": 0.03407374793590491
+    },
+    "K-plus": {
+      "Heart Disease": 0.7499993750005625,
+      "Obesity": 0.1580235235214798,
+      "Diabetes": 0.03588923712336728
+    },
+    "Bicriterion": {
+      "Heart Disease": 0.6597217146030628,
+      "Obesity": 0.07355272840382676,
+      "Diabetes": 0.02056885467460647
+    }
+  },
+  "N-Sigma (ErrorRate)": {
+    "Ungrouped": {
+      "Heart Disease": 0.17469035055335544,
+      "Obesity": 0.1479453217002415,
+      "Diabetes": 0.052269058806715375
+    },
+    "Random": {
+      "Heart Disease": 0.31530401964827703,
+      "Obesity": 0.123361378946078,
+      "Diabetes": 0.04564560287002617
+    },
+    "Greedy": {
+      "Heart Disease": 0.35881415776343745,
+      "Obesity": 0.1462564346238466,
+      "Diabetes": 0.06721535951467754
+    },
+    "K-plus": {
+      "Heart Disease": 0.28242527032437315,
+      "Obesity": 0.20008428556821473,
+      "Diabetes": 0.07294637533028325
+    },
+    "Bicriterion": {
+      "Heart Disease": 0.23331298888523008,
+      "Obesity": 0.13257158213336612,
+      "Diabetes": 0.04208425946938248
+    }
+  },
+  "Average distance from origin": {
+    "Ungrouped": {
+      "Heart Disease": 0.13636324001421818,
+      "Obesity": 0.21611205217431967,
+      "Diabetes": 0.1105106359330243
+    },
+    "Random": {
+      "Heart Disease": 0.14800759177738504,
+      "Obesity": 0.1833517065561677,
+      "Diabetes": 0.11300339922942605
+    },
+    "Greedy": {
+      "Heart Disease": 0.13110201253109105,
+      "Obesity": 0.20588394162558052,
+      "Diabetes": 0.10503223428890578
+    },
+    "K-plus": {
+      "Heart Disease": 0.1038044263108952,
+      "Obesity": 0.16876010060631283,
+      "Diabetes": 0.10619410924559611
+    },
+    "Bicriterion": {
+      "Heart Disease": 0.11313936382222933,
+      "Obesity": 0.1972712340389201,
+      "Diabetes": 0.10756049083422564
+    }
+  }
+}

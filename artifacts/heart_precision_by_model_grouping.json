@@ -1,0 +1,37 @@
+{
+  "Logistic Regression": {
+    "Bicriterion": 0.9677374305735752,
+    "Greedy": 0.962659679004258,
+    "K-plus": 0.9863013698630138,
+    "Random": 0.9930555555555556,
+    "Ungrouped": 0.9701298701298702
+  },
+  "Neural Network Classification": {
+    "Bicriterion": 0.9653743190042126,
+    "Greedy": 0.962659679004258,
+    "K-plus": 0.9701298701298703,
+    "Random": 0.9701298701298702,
+    "Ungrouped": 0.9594202898550727
+  },
+  "Random Forest Classification": {
+    "Bicriterion": 0.9703005618867067,
+    "Greedy": 0.9553571428571427,
+    "K-plus": 0.9797297297297297,
+    "Random": 0.9291680588038759,
+    "Ungrouped": 0.967256932843301
+  },
+  "Support Vector Classification": {
+    "Bicriterion": 0.9667444676821682,
+    "Greedy": 0.9626596790042581,
+    "K-plus": 0.9742063492063492,
+    "Random": 0.9863013698630136,
+    "Ungrouped": 0.9863013698630136
+  },
+  "Xgboost Classification": {
+    "Bicriterion": 0.9627435064935065,
+    "Greedy": 0.9439895185063871,
+    "K-plus": 0.9553571428571428,
+    "Random": 0.9410628019323671,
+    "Ungrouped": 0.9672569328433009
+  }
+}

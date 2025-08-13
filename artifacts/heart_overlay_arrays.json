@@ -1,0 +1,61 @@
+{
+  "model_order": [
+    "Xgboost Classification",
+    "Support Vector Classification",
+    "Random Forest Classification",
+    "Neural Network Classification",
+    "Logistic Regression"
+  ],
+  "grouping_order": [
+    "Ungrouped",
+    "Random",
+    "Greedy",
+    "K-plus",
+    "Bicriterion",
+    "Benchmark"
+  ],
+  "values_pct": {
+    "Ungrouped": [
+      96.726,
+      98.63,
+      96.726,
+      95.942,
+      97.013
+    ],
+    "Random": [
+      94.106,
+      98.63,
+      92.917,
+      97.013,
+      99.306
+    ],
+    "Greedy": [
+      94.399,
+      96.266,
+      95.536,
+      96.266,
+      96.266
+    ],
+    "K-plus": [
+      95.536,
+      97.421,
+      97.973,
+      97.013,
+      98.63
+    ],
+    "Bicriterion": [
+      96.274,
+      96.674,
+      97.03,
+      96.537,
+      96.774
+    ],
+    "Benchmark": [
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  }
+}

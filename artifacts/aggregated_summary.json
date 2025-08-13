@@ -1,0 +1,130 @@
+{
+  "Accuracy": {
+    "Ungrouped": {
+      "Breast Cancer": 0.9705513784461153,
+      "Heart Disease": 0.6332726168791742,
+      "Obesity": 0.9333998503367423,
+      "Diabetes": 0.5699958237114922
+    },
+    "Random": {
+      "Breast Cancer": 0.969785575048733,
+      "Heart Disease": 0.6191677175283733,
+      "Obesity": 0.7910383455407152,
+      "Diabetes": 0.5646096398565322
+    },
+    "Greedy": {
+      "Breast Cancer": 0.9617794486215538,
+      "Heart Disease": 0.6343001261034048,
+      "Obesity": 0.8603718556325192,
+      "Diabetes": 0.5552056207930035
+    },
+    "K-plus": {
+      "Breast Cancer": 0.9767353165522502,
+      "Heart Disease": 0.6557377049180327,
+      "Obesity": 0.7408598510494245,
+      "Diabetes": 0.559276144471137
+    },
+    "Bicriterion": {
+      "Breast Cancer": 0.9682860998650472,
+      "Heart Disease": 0.6235813366960908,
+      "Obesity": 0.8863744075829384,
+      "Diabetes": 0.5577089372574068
+    }
+  },
+  "F1-score": {
+    "Ungrouped": {
+      "Breast Cancer": 0.9686478992539678,
+      "Heart Disease": 0.28498194998296056,
+      "Obesity": 0.9318536342385468,
+      "Diabetes": 0.35939493607555056
+    },
+    "Random": {
+      "Breast Cancer": 0.9677035670701124,
+      "Heart Disease": 0.2640832762227608,
+      "Obesity": 0.7850677890083143,
+      "Diabetes": 0.3537832031805383
+    },
+    "Greedy": {
+      "Breast Cancer": 0.9592788187131263,
+      "Heart Disease": 0.2707093792620888,
+      "Obesity": 0.8548414765901855,
+      "Diabetes": 0.33818362795790496
+    },
+    "K-plus": {
+      "Breast Cancer": 0.9751284817602435,
+      "Heart Disease": 0.3018443692736754,
+      "Obesity": 0.7326501889342135,
+      "Diabetes": 0.3372725725612145
+    },
+    "Bicriterion": {
+      "Breast Cancer": 0.9662073978115898,
+      "Heart Disease": 0.2556143707247125,
+      "Obesity": 0.8825451930898768,
+      "Diabetes": 0.3414272802343261
+    }
+  },
+  "Precision": {
+    "Ungrouped": {
+      "Breast Cancer": 0.9693243350938429,
+      "Heart Disease": 0.2949014762685779,
+      "Obesity": 0.9316828894877802,
+      "Diabetes": 0.5050797185621861
+    },
+    "Random": {
+      "Breast Cancer": 0.9697609015683315,
+      "Heart Disease": 0.274339628825741,
+      "Obesity": 0.7871423238070446,
+      "Diabetes": 0.47089975310308047
+    },
+    "Greedy": {
+      "Breast Cancer": 0.9597612669371711,
+      "Heart Disease": 0.2560325201114675,
+      "Obesity": 0.8556264719048247,
+      "Diabetes": 0.5055120803354863
+    },
+    "K-plus": {
+      "Breast Cancer": 0.9780623877631025,
+      "Heart Disease": 0.3239843640704408,
+      "Obesity": 0.7346756972368583,
+      "Diabetes": 0.3677119311865805
+    },
+    "Bicriterion": {
+      "Breast Cancer": 0.9670495135009054,
+      "Heart Disease": 0.25545562940444533,
+      "Obesity": 0.8831950624202426,
+      "Diabetes": 0.4963547813629823
+    }
+  },
+  "Recall": {
+    "Ungrouped": {
+      "Breast Cancer": 0.9680021679982147,
+      "Heart Disease": 0.27952679072405784,
+      "Obesity": 0.9320295929150152,
+      "Diabetes": 0.27942744218925686
+    },
+    "Random": {
+      "Breast Cancer": 0.9656718503236243,
+      "Heart Disease": 0.257127001047945,
+      "Obesity": 0.7830158416749025,
+      "Diabetes": 0.28408415159399936
+    },
+    "Greedy": {
+      "Breast Cancer": 0.9587986390485977,
+      "Heart Disease": 0.28748992324005473,
+      "Obesity": 0.8540849044873098,
+      "Diabetes": 0.2545205797934008
+    },
+    "K-plus": {
+      "Breast Cancer": 0.972234077859937,
+      "Heart Disease": 0.2842959070207663,
+      "Obesity": 0.7306504897672044,
+      "Diabetes": 0.31540753596676585
+    },
+    "Bicriterion": {
+      "Breast Cancer": 0.9653754647170396,
+      "Heart Disease": 0.2593313210467729,
+      "Obesity": 0.8819024933328359,
+      "Diabetes": 0.26216622538310036
+    }
+  }
+}

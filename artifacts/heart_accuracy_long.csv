@@ -1,0 +1,26 @@
+Model,Grouping,Accuracy
+Xgboost Classification,Ungrouped,0.9649122807017544
+Xgboost Classification,Random,0.9473684210526315
+Xgboost Classification,Greedy,0.9473684210526315
+Xgboost Classification,K-plus,0.956140350877193
+Xgboost Classification,Bicriterion,0.9649122807017544
+Support Vector Classification,Ungrouped,0.9824561403508771
+Support Vector Classification,Random,0.9824561403508771
+Support Vector Classification,Greedy,0.9649122807017544
+Support Vector Classification,K-plus,0.9736842105263158
+Support Vector Classification,Bicriterion,0.9671052631578947
+Random Forest Classification,Ungrouped,0.9649122807017544
+Random Forest Classification,Random,0.9298245614035087
+Random Forest Classification,Greedy,0.956140350877193
+Random Forest Classification,K-plus,0.9736842105263158
+Random Forest Classification,Bicriterion,0.9714912280701755
+Neural Network Classification,Ungrouped,0.9649122807017544
+Neural Network Classification,Random,0.9736842105263157
+Neural Network Classification,Greedy,0.9649122807017544
+Neural Network Classification,K-plus,0.9736842105263158
+Neural Network Classification,Bicriterion,0.9678362573099415
+Logistic Regression,Ungrouped,0.9736842105263157
+Logistic Regression,Random,0.9912280701754386
+Logistic Regression,Greedy,0.9649122807017545
+Logistic Regression,K-plus,0.982456140350877
+Logistic Regression,Bicriterion,0.968421052631579

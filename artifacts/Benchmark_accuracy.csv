@@ -1,0 +1,6 @@
+Model,Min (%),Mean (%),Max (%)
+Xgboost Classification,93.673,97.002,99.468
+Support Vector Classification,90.814,94.768,98.162
+Random Forest Classification,95.102,97.94,100
+Neural Network Classification,86.51,91.635,95.973
+Logistic Regression,91.555,95.503,98.576
