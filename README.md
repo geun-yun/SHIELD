@@ -1,5 +1,5 @@
 # SHIELD
-**SH**apley-based **I**nformation-theoretic framework for **E**quitable **L**earning via **D**issimilarity
+**SH**apley and **I**nformation-theory based framework for **E**quitable **L**earning via **D**issimilar feature grouping
 
 *This research is currently incomplete.* 
 
